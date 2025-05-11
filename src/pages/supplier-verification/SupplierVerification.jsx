@@ -6,7 +6,7 @@ import SideNav from "../../components/side-nav/SideNav";
 import { get } from "../../utils/axiosHelpers";
 // import FullPageLoader from "../../components/full-page-loader/FullPageLoader";
 import { useNavigate } from "react-router-dom";
-import { BsArrow90DegUp } from "react-icons/bs";
+import { BsArrow90DegUp, BsEye } from "react-icons/bs";
 import { FiArrowUpRight } from "react-icons/fi";
 import Cookies from 'js-cookie';
 import { BiCalendar, BiMap, BiSearch } from "react-icons/bi";
@@ -22,7 +22,7 @@ const SupplierVerification = () => {
     const [isLoading, setIsLoading] = useState(true)
     const navigate = useNavigate()
     const token = Cookies.get('token')
-    const tabs = ["Pending Verification", "Approved Verification", "Disapproved Verification"]
+    const tabs = ["All", "Pending Verification", "Approved Verification", "Disapproved Verification"]
     const [selectedTab, setSelectedTab] = useState(tabs[0])
 
     const getAllApplications = async () => {
@@ -38,7 +38,7 @@ const SupplierVerification = () => {
     }
 
     const getSummary = async () => {
-      const res = await get('/administration/application_summary')
+      const res = await get('/administration/summaries/supplier_summary')
       setSummary(res.data)
       console.log(res);
     }
@@ -68,12 +68,12 @@ const SupplierVerification = () => {
           <TopNav setToggleNav={setToggleNav} toggleNav={toggleNav} />
           <div className="px-[10px] md:px-[30px] pb-[1rem] mt-[100px]">
 
-            <div className="grid grid-cols-5 gap-4 mt-7">
+            <div className="grid grid-cols-4 gap-4 mt-7">
               <div className="flex items-start gap-5 border border-[#CCE0FF] rounded-[4px] p-3">
                 <img src="./file.svg" alt="" />
                 <div>
-                  <p className="text-text-color">Total Applications</p>
-                  <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.total_applications}</p>
+                  <p className="text-text-color">Total Verifications</p>
+                  <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.total_verification?.count}</p>
                   <div className="flex items-center gap-2 text-[#039855] text-[12px]">
                     <FiArrowUpRight />
                     <p>+12% from last month</p>
@@ -83,8 +83,8 @@ const SupplierVerification = () => {
               <div className="flex items-start gap-5 border border-[#CCE0FF] p-3 rounded-[4px]">
                 <img src="./approved.svg" alt="" />
                 <div>
-                  <p className="text-text-color">Approved Applications</p>
-                  <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.approved_applications}</p>
+                  <p className="text-text-color">Approved Verifications</p>
+                  <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.approved_verification?.count}</p>
                   <div className="flex items-center gap-2 text-[#039855] text-[12px]">
                     <FiArrowUpRight />
                     <p>+12% from last month</p>
@@ -94,8 +94,8 @@ const SupplierVerification = () => {
               <div className="flex items-start gap-5 border border-[#CCE0FF] p-3 rounded-[4px]">
                 <img src="./pending.svg" alt="" />
                 <div>
-                  <p className="text-text-color">Pending Applications</p>
-                  <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.pending_applications}</p>
+                  <p className="text-text-color">Pending Verifications</p>
+                  <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.pending_verification?.count}</p>
                   <div className="flex items-center gap-2 text-[#039855] text-[12px]">
                     <FiArrowUpRight />
                     <p>+12% from last month</p>
@@ -105,19 +105,8 @@ const SupplierVerification = () => {
               <div className="flex items-start gap-5 border border-[#CCE0FF] p-3 rounded-[4px]">
                 <img src="./info.svg" alt="" />
                 <div>
-                  <p className="text-text-color">Rejected Applications</p>
-                  <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.rejected_applications}</p>
-                  <div className="flex items-center gap-2 text-[#039855] text-[12px]">
-                    <FiArrowUpRight />
-                    <p>+12% from last month</p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-start gap-5 border border-[#CCE0FF] p-3 rounded-[4px]">
-                <img src="./approved.svg" alt="" />
-                <div>
-                  <p className="text-text-color">Applications Under Review</p>
-                  <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.under_review_applications}</p>
+                  <p className="text-text-color">Disapproved Verifications</p>
+                  <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.disapproved_verification?.count}</p>
                   <div className="flex items-center gap-2 text-[#039855] text-[12px]">
                     <FiArrowUpRight />
                     <p>+12% from last month</p>
@@ -158,22 +147,24 @@ const SupplierVerification = () => {
                             <th scope="col" class="px-6 py-3 font-[600]">Company</th>
                             <th scope="col" class="px-6 py-3 font-[600]">Country</th>
                             <th scope="col" class="px-6 py-3 font-[600]">Product Name</th>
-                            <th scope="col" class="px-2 py-3 font-[600]">Status</th>
-                            <th scope="col" class="px-2 py-3 font-[600]">AI Score</th>
-                            <th scope="col" class="px-2 py-3 font-[600]">Date</th>
+                            <th scope="col" class="px-6 py-3 font-[600]">Status</th>
+                            <th scope="col" class="px-6 py-3 font-[600]">AI Score</th>
+                            <th scope="col" class="px-6 py-3 font-[600]">Date</th>
+                            <th scope="col" class="px-6 py-3 font-[600]"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        {
+                      {
                             applications?.data?.map((application, index) => (
                                 <tr className="border-b" key={index}>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#101828] flex gap-1 items-center">{application.application_number}</td>
+                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] flex gap-1 items-center">{application.application_number}</td>
                                     <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">Concrete Mix</td>
                                     <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">26 Apr 2025</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#101828]">{application.product_name}</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#101828]">#70,000</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#101828]">#70,000</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#101828]">{ new Date(application.created_at).toLocaleDateString() }</td>
+                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application.product_name}</td>
+                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] capitalize">{application.current_review_stage}</td>
+                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">#70,000</td>
+                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{ new Date(application.created_at).toLocaleDateString() }</td>
+                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] cursor-pointer"> <BsEye /> </td>
                                 </tr>
                             ))
                         }

@@ -152,22 +152,24 @@ const Applications = () => {
                             <th scope="col" class="px-6 py-3 font-[600]">Company</th>
                             <th scope="col" class="px-6 py-3 font-[600]">Country</th>
                             <th scope="col" class="px-6 py-3 font-[600]">Product Name</th>
-                            <th scope="col" class="px-2 py-3 font-[600]">Status</th>
-                            <th scope="col" class="px-2 py-3 font-[600]">AI Score</th>
-                            <th scope="col" class="px-2 py-3 font-[600]">Date</th>
+                            <th scope="col" class="px-6 py-3 font-[600]">Status</th>
+                            <th scope="col" class="px-6 py-3 font-[600]">AI Score</th>
+                            <th scope="col" class="px-6 py-3 font-[600]">Date</th>
+                            <th scope="col" class="px-6 py-3 font-[600]"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        {
+                      {
                             applications?.data?.map((application, index) => (
                                 <tr className="border-b" key={index}>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#101828] flex gap-1 items-center">{application.application_number}</td>
+                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] flex gap-1 items-center">{application.application_number}</td>
                                     <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">Concrete Mix</td>
                                     <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">26 Apr 2025</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#101828]">{application.product_name}</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#101828]">#70,000</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#101828]">#70,000</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#101828]">{ new Date(application.created_at).toLocaleDateString() }</td>
+                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application.product_name}</td>
+                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] capitalize">{application.current_review_stage}</td>
+                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">#70,000</td>
+                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{ new Date(application.created_at).toLocaleDateString() }</td>
+                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] cursor-pointer"> <BsEye /> </td>
                                 </tr>
                             ))
                         }

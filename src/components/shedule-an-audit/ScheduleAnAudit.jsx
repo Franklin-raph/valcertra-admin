@@ -7,7 +7,7 @@ import BtnLoader from '../btnLoader/BtnLoader';
 import { BiChevronDown } from 'react-icons/bi';
 import { FiLoader, FiUser } from 'react-icons/fi';
 
-export default function ScheduleAnAudit({ staffs, setScheduleAnAudit, getScheduledAudits, applications }) {
+export default function ScheduleAnAudit({ staffs, setScheduleAnAudit, getAudits, applications }) {
   const [dropDown, setDropDown] = useState()
   const [auditor, setAuditor] = useState({})
   const [application, setApplication] = useState({})
@@ -61,7 +61,7 @@ export default function ScheduleAnAudit({ staffs, setScheduleAnAudit, getSchedul
             const response = await post('/administration/audit-schedules/', {...formData, auditor:auditor.id, application:application.id})
             setMsg(response.message)
             setAlertType('success')
-            getScheduledAudits()
+            getAudits()
             formData.scheduled_date = ""
             formData.scheduled_time = ""
             formData.notes = ""

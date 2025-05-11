@@ -236,7 +236,7 @@ const AuditManagement = () => {
         </div>
       </>
       {
-        scheduleAnAudit && <ScheduleAnAudit staffs={staffs} applications={applications} setScheduleAnAudit={setScheduleAnAudit} getScheduledAudits={getScheduledAudits}/>
+        scheduleAnAudit && <ScheduleAnAudit staffs={staffs} applications={applications} setScheduleAnAudit={setScheduleAnAudit} getAudits={getAudits}/>
       }
     </div>
   );
