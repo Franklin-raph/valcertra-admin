@@ -49,6 +49,22 @@ export const put = async (url, data = {}) => {
 };
 
 /**
+ * Helper function for PUT requests
+ * @param {string} url - The endpoint to request
+ * @param {object} data - Request body
+ * @returns {Promise} - Axios response
+ */
+export const patch = async (url, data = {}) => {
+  try {
+    const response = await axiosInstance.patch(url, data);
+    return response;
+  } catch (error) {
+    handleAxiosError(error);
+    throw error;
+  }
+};
+
+/**
  * Helper function for DELETE requests
  * @param {string} url - The endpoint to request
  * @returns {Promise} - Axios response

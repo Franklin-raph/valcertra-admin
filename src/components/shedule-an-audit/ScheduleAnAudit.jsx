@@ -7,30 +7,30 @@ import BtnLoader from '../btnLoader/BtnLoader';
 import { BiChevronDown } from 'react-icons/bi';
 import { FiLoader, FiUser } from 'react-icons/fi';
 
-export default function ScheduleAnAudit({ setScheduleAnAudit, getAllProductPrices, applications }) {
+export default function ScheduleAnAudit({ staffs, setScheduleAnAudit, getScheduledAudits, applications }) {
   const [dropDown, setDropDown] = useState()
   const [auditor, setAuditor] = useState({})
   const [application, setApplication] = useState({})
   const [searchText, setSeacrhText] = useState('')
   const [loader, setLoader] = useState(false)
-  const staffs = [
-    {
-        name:"Frank",
-        id:"1"
-    },
-    {
-        name:"Dan",
-        id:"2"
-    },
-    {
-        name:"Emma",
-        id:"3"
-    },
-    {
-        name:"Luke",
-        id:"4"
-    }
-  ]
+//   const staffs = [
+//     {
+//         name:"Frank",
+//         id:"1"
+//     },
+//     {
+//         name:"Dan",
+//         id:"2"
+//     },
+//     {
+//         name:"Emma",
+//         id:"3"
+//     },
+//     {
+//         name:"Luke",
+//         id:"4"
+//     }
+//   ]
   const [formData, setFormData] = useState({
     scheduled_date: '',
     scheduled_time: '',
@@ -54,19 +54,21 @@ export default function ScheduleAnAudit({ setScheduleAnAudit, getAllProductPrice
         setAlertType('error')
         return
     }
-    console.log( {...formData, auditor:auditor.id, applicationapplication:application.id});
+    console.log( {...formData, auditor:auditor.id, application:application.id});
     
     try {
             setLoading(true)
-            const response = await post('/administration/audit-schedules/', {...formData, auditor:auditor.id, applicationapplication:application.id})
+            const response = await post('/administration/audit-schedules/', {...formData, auditor:auditor.id, application:application.id})
             setMsg(response.message)
             setAlertType('success')
-            getAllProductPrices()
+            getScheduledAudits()
             formData.scheduled_date = ""
             formData.scheduled_time = ""
             formData.notes = ""
-            auditor = {}
-            application = {}
+            setAuditor({})
+            setApplication({})
+            console.log(response);
+            
         } catch (error) {
             setMsg(error.message)
             setAlertType('error')
@@ -143,7 +145,8 @@ export default function ScheduleAnAudit({ setScheduleAnAudit, getAllProductPrice
                     <label className="block text-sm font-medium text-[#344054] mb-1 text-left">Auditor</label>
                     <div className='cursor-pointer border border-[#D0D5DD] bg-white py-2 px-2 w-full rounded-[4px] text-[#667085] flex items-center justify-between'>
                         <FiUser className='text-[20px]' />
-                        <input type="text" placeholder='Select Auditor' value={auditor.name} className='outline-none bg-transparent w-full ml-3 cursor-pointer'/>
+                        <p className='outline-none bg-transparent w-full ml-3 cursor-pointer text-left'>{auditor?.first_name} {auditor?.last_name}</p>
+                        {/* <input type="text" placeholder='Select Auditor' value={auditor?.first_name auditor?.last_name} className='outline-none bg-transparent w-full ml-3 cursor-pointer'/> */}
                         <BiChevronDown onClick={() => setDropDown(dropDown === "auditor" ? false : "auditor")} className='text-[22px] cursor-pointer'/>
                         {
                             dropDown === "auditor" &&
@@ -151,13 +154,13 @@ export default function ScheduleAnAudit({ setScheduleAnAudit, getAllProductPrice
                                 {/* <input type="text" onChange={e => setSeacrhText(e.target.value)} placeholder='Search City' className='border border-gray-300 w-full placeholder:text-[13px] text-[13px] outline-none px-[4px] rounded mb-1 py-[5px]'/> */}
                                 <div>
                                 {
-                                    staffs?.filter(staff => staff.name.toLowerCase().includes(searchText.toLowerCase()))
+                                    staffs?.filter(staff => staff.first_name.toLowerCase().includes(searchText.toLowerCase()))
                                     .map((staff) => (
                                         <div className='flex items-center gap-2 hover:bg-gray-300 cursor-pointer p-[5px] text-[14px] text-gray-500'onClick={() => {
                                             setDropDown(false)
                                             setAuditor(staff)
                                         }}>
-                                            <p>{staff.name}</p>
+                                            <p>{staff.first_name} {staff.last_name}</p>
                                         </div>
                                     ))
                                 }

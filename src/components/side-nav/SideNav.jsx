@@ -55,19 +55,19 @@ const SideNav = ({toggleNav, setToggleNav}) => {
                 <p className="">Audit Management</p>
             </div>
           </Link>
-          <Link to='/profile' className={ location.pathname.includes('profile') ? `flex items-center justify-between py-[10px] text-[#fff] border-r-[3px] w-full` :`text-[#D0D5DD] flex items-center justify-between py-[10px]`}>
+          <Link to='/certifications' className={ location.pathname.includes('certification') ? `flex items-center justify-between py-[10px] text-[#fff] border-r-[3px] w-full` :`text-[#D0D5DD] flex items-center justify-between py-[10px]`}>
             <div className="flex items-center gap-2">
                 <FiAward className='text-[20px]'/>
                 <p className="">Certifications</p>
             </div>
           </Link>
-          <Link to='/profile' className={ location.pathname.includes('profile') ? `flex items-center justify-between py-[10px] text-[#fff] border-r-[3px] w-full` :`text-[#D0D5DD] flex items-center justify-between py-[10px]`}>
+          <Link to='/analytics' className={ location.pathname.includes('analytics') ? `flex items-center justify-between py-[10px] text-[#fff] border-r-[3px] w-full` :`text-[#D0D5DD] flex items-center justify-between py-[10px]`}>
             <div className="flex items-center gap-2">
                 <FiPieChart className='text-[20px]'/>
                 <p className="">Analytics</p>
             </div>
           </Link>
-          <Link to='/profile' className={ location.pathname.includes('profile') ? `flex items-center justify-between py-[10px] text-[#fff] border-r-[3px] w-full` :`text-[#D0D5DD] flex items-center justify-between py-[10px]`}>
+          <Link to='/staffs' className={ location.pathname.includes('staff') ? `flex items-center justify-between py-[10px] text-[#fff] border-r-[3px] w-full` :`text-[#D0D5DD] flex items-center justify-between py-[10px]`}>
             <div className="flex items-center gap-2">
                 <FiUsers className='text-[20px]'/>
                 <p className="">Staffs</p>
@@ -79,7 +79,7 @@ const SideNav = ({toggleNav, setToggleNav}) => {
                 <p className="">Product Price</p>
             </div>
           </Link>
-          <Link to='/profile' className={ location.pathname.includes('profile') ? `flex items-center justify-between py-[10px] text-[#fff] border-r-[3px] w-full` :`text-[#D0D5DD] flex items-center justify-between py-[10px]`}>
+          <Link to='/my-profile' className={ location.pathname.includes('profile') ? `flex items-center justify-between py-[10px] text-[#fff] border-r-[3px] w-full` :`text-[#D0D5DD] flex items-center justify-between py-[10px]`}>
             <div className="flex items-center gap-2">
                 <FiUser className='text-[20px]'/>
                 <p className="">My Profile</p>

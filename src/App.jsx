@@ -9,6 +9,10 @@ import ProductPrice from './pages/product-price/ProductPrice'
 import Applications from './pages/applications/Applications'
 import SupplierVerification from './pages/supplier-verification/SupplierVerification'
 import AuditManagement from './pages/audit-management/AuditManagement'
+import Staffs from './pages/staffs/Staffs'
+import StaffProfile from './pages/staff-profile/StaffProfile'
+import MyProfile from './pages/my-profile/MyProfile'
+import Certifications from './pages/certifications/Certifications'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -21,6 +25,11 @@ function App() {
         <Route path='/applications' element={<Applications />}/>
         <Route path='/supplier-verification' element={<SupplierVerification />}/>
         <Route path='/audit-management' element={<AuditManagement />}/>
+        <Route path='/staffs' element={<Staffs />}/>
+        <Route path='/staff/:id' element={<StaffProfile />}/>
+        <Route path='/my-profile' element={<MyProfile />}/>
+        <Route path='/certifications' element={<Certifications />}/>
+        <Route path='/analytics' element={<Certifications />}/>
         <Route path='/product-price' element={<ProductPrice />}/>
       </Routes>
     </HashRouter>
