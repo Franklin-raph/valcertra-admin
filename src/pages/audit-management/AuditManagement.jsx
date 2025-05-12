@@ -18,6 +18,7 @@ const AuditManagement = () => {
     const [audits, setAudits] = useState()
     const [completedAudits, setCompletedAudits] = useState()
     const [auditsInProgress, setAuditsInProgress] = useState()
+    const [searchText, setSeacrhText] = useState('')
     const [isLoading, setIsLoading] = useState(true)
     const navigate = useNavigate()
     const tabs = ["Pending Audits", "Scheduled Audits", "Completed Audits"]
@@ -276,7 +277,7 @@ const AuditManagement = () => {
                     </div>
                     <div className='text-[#19201D] items-center gap-3 border py-[6px] px-[8px] rounded-[4px] cursor-pointer hidden lg:flex'>
                         <BiSearch fontSize={"20px"}/>
-                        <input type="text" placeholder='Search' className='outline-none' />
+                        <input type="text" placeholder='Search' onChange={e => setSeacrhText(e.target.value)} className='outline-none' />
                     </div>
                 </div>
                 
@@ -303,7 +304,8 @@ const AuditManagement = () => {
                             </thead>
                             <tbody>
                                 {
-                                    applications?.data?.map((application, index) => (
+                                  applications?.data?.filter(application => application.application_number.toLowerCase().includes(searchText.toLowerCase()) || application?.user?.company_data?.company_name.toLowerCase().includes(searchText.toLowerCase()) || application?.product_name.toLowerCase().includes(searchText.toLowerCase()))
+                                  .map((application, index) => (
                                         <tr className="border-b" key={index}>
                                             <td className="px-6 py-4 text-[12px] text-[#475467] flex gap-1 items-center">{application?.application_number}</td>
                                             <td className="px-6 py-4 text-[12px] text-[#475467]">{application?.user?.company_data?.company_name ? application?.user.company_data?.company_name : "Nill"}</td>

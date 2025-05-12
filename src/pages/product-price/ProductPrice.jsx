@@ -14,6 +14,7 @@ const ProductPrice = () => {
     const [updateProductPrice, setUpdateProductPrice] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingProductData, setIsLoadingProductData] = useState(false);
+    const [searchText, setSeacrhText] = useState('')
     const [formData, setFormData] = useState({
         product_category: '',
         product_amount: ''
@@ -132,7 +133,7 @@ const ProductPrice = () => {
                                 </p>
                                 <div className='text-[#19201D] items-center gap-3 border py-[6px] px-[8px] rounded-[4px] cursor-pointer hidden lg:flex'>
                                     <BiSearch fontSize={"20px"}/>
-                                    <input type="text" placeholder='Search' className='outline-none' />
+                                    <input type="text" placeholder='Search' onChange={e => setSeacrhText(e.target.value)} className='outline-none' />
                                 </div>
                             </div>
                             <div className="relative overflow-x-auto">
@@ -152,7 +153,8 @@ const ProductPrice = () => {
                                         </thead>
                                         <tbody>
                                             {allProductPrices?.data?.length > 0 ? (
-                                                allProductPrices.data.map((productPrice, index) => (
+                                                allProductPrices.data?.filter(productPrice => productPrice?.product_category.toLowerCase().includes(searchText.toLowerCase()) || productPrice?.product_amount.toLowerCase().includes(searchText.toLowerCase()))
+                                                .map((productPrice, index) => (
                                                     <tr key={index}>
                                                         <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] capitalize">{productPrice?.product_category}</td>
                                                         <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{productPrice?.product_amount}</td>

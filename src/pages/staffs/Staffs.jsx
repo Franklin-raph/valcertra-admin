@@ -20,6 +20,7 @@ const Staffs = () => {
     const [staffs, setStaffs] = useState()
     const [summary, setSummary] = useState()
     const [addStaff, setAddStaff] = useState(false)
+    const [searchText, setSeacrhText] = useState('')
     const [isLoading, setIsLoading] = useState(true)
     const navigate = useNavigate()
     const token = Cookies.get('token')
@@ -167,7 +168,7 @@ const Staffs = () => {
                     </div>
                     <div className='text-[#19201D] items-center gap-3 border py-[6px] px-[8px] rounded-[4px] cursor-pointer hidden lg:flex'>
                         <BiSearch fontSize={"20px"}/>
-                        <input type="text" placeholder='Search' className='outline-none' />
+                        <input type="text" placeholder='Search' onChange={e => setSeacrhText(e.target.value)} className='outline-none' />
                     </div>
                 </div>
               {/* <div className="flex items-center justify-between px-7 pt-6">
@@ -196,7 +197,8 @@ const Staffs = () => {
                     </thead>
                     <tbody>
                         {
-                            staffs?.data?.map((staff, index) => (
+                            staffs?.data?.filter(staff => staff?.first_name.toLowerCase().includes(searchText.toLowerCase()) || staff?.last_name.toLowerCase().includes(searchText.toLowerCase()) || staff?.role.toLowerCase().includes(searchText.toLowerCase()))
+                            .map((staff, index) => (
                                 <tr className="border-b" key={index}>
                                     <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{staff.first_name} {staff.last_name}</td>
                                     <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">26 Apr 2025</td>
@@ -210,7 +212,7 @@ const Staffs = () => {
                         }
                     </tbody>
                 </table>
-            </div>
+              </div>
             </div>
           </div>
         </div>
