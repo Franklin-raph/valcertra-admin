@@ -11,6 +11,7 @@ import { FiArrowDownRight, FiArrowUpRight } from "react-icons/fi";
 import Cookies from 'js-cookie';
 import { BiCalendar, BiMap } from "react-icons/bi";
 import { RiMap2Fill } from "react-icons/ri";
+import ApplicationTrendsChart from "../../components/application-trends-chart/ApplicationTrendsChart";
 
 
 const Dashboard = () => {
@@ -18,10 +19,10 @@ const Dashboard = () => {
     const [toggleNav, setToggleNav] = useState(false)
     const [applications, setApplications] = useState()
     const [summary, setSummary] = useState()
+    const [analysis, setAnalysis] = useState()
     const [scheduledAudits, setScheduledAudits] = useState()
     const [isLoading, setIsLoading] = useState(true)
     const navigate = useNavigate()
-    const token = Cookies.get('token')
 
     // const getAllApplications = async () => {
     //   const res = await fetch('https://vercertrabe.onrender.com/administration/applications/?view_current=true', {
@@ -50,6 +51,16 @@ const Dashboard = () => {
       }
     }
 
+    const getAnalysis = async () => {
+      try {
+        const res = await get('/administration/analysis/dashboard_stats/')
+        setAnalysis(res.data)
+        console.log(res);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
     const getScheduledAudits = async () => {
       const res = await get('/administration/audit-schedules/?my_audits=true')
       setScheduledAudits(res.data)
@@ -59,7 +70,7 @@ const Dashboard = () => {
     useEffect(() => {
       const fetchData = async () => {
         setIsLoading(true);
-        await Promise.all([getSummary(), getAllApplications(), getScheduledAudits()]);
+        await Promise.all([getSummary(), getAllApplications(), getScheduledAudits(), getAnalysis()]);
         setIsLoading(false);
       };
       
@@ -153,6 +164,8 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
+
+            <ApplicationTrendsChart />
 
             <div className="mt-12 border rounded-[8px]">
               <div className="flex items-center justify-between px-7 pt-6">
