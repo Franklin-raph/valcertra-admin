@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TopNav from "../../components/top-nav/TopNav";
 import SideNav from "../../components/side-nav/SideNav";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { PiNotePencil } from "react-icons/pi";
 import { FiMail, FiMap, FiUser } from "react-icons/fi";
 import { MdEmail } from "react-icons/md";
@@ -25,11 +25,12 @@ const StaffProfile = () => {
     const user = JSON.parse(localStorage.getItem('user'))
     const [userDetails, setUserDetails] = useState()
     const [isLoading, setIsLoading] = useState(true)
+    const { id } = useParams()
 
     const getUser = async () => {
         try {
             setIsLoading(true)
-            const res = await get(`/profile/user/${user.id}`)
+            const res = await get(`/profile/user/${id}`)
             setUserDetails(res.data)
             console.log(res.data);
         } catch (error) {
@@ -67,16 +68,12 @@ const StaffProfile = () => {
                         <p className="text-[15px]">{userDetails?.email}</p>
                     </div>
                     <div className="text-[#667085] flex items-center gap-2">
-                        <CiLocationOn className="text-[15px]"/>
-                        <p className="text-[15px]">{userDetails?.email}</p>
-                    </div>
-                    <div className="text-[#667085] flex items-center gap-2">
                         <BiCalendar className="text-[15px]"/>
-                        <p className="text-[15px]">{userDetails?.email}</p>
+                        <p className="text-[15px]">Joined { new Date(userDetails?.created_at).toDateString() }</p>
                     </div>
                     <div className="text-[#667085] flex items-center gap-2">
                         <BsClock className="text-[15px]"/>
-                        <p className="text-[15px]">{userDetails?.email}</p>
+                        <p className="text-[15px]">Last active{userDetails?.email}</p>
                     </div>
                 </div>
             </div>

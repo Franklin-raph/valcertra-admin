@@ -79,16 +79,12 @@ const MyProfile = () => {
                         <p className="text-[15px]">{userDetails?.email}</p>
                     </div>
                     <div className="text-[#667085] flex items-center gap-2">
-                        <CiLocationOn className="text-[15px]"/>
-                        <p className="text-[15px]">{userDetails?.email}</p>
-                    </div>
-                    <div className="text-[#667085] flex items-center gap-2">
                         <BiCalendar className="text-[15px]"/>
-                        <p className="text-[15px]">{userDetails?.email}</p>
+                        <p className="text-[15px]">Joined { new Date(userDetails?.created_at).toDateString() }</p>
                     </div>
                     <div className="text-[#667085] flex items-center gap-2">
                         <BsClock className="text-[15px]"/>
-                        <p className="text-[15px]">{userDetails?.email}</p>
+                        <p className="text-[15px]">Last active {userDetails?.email}</p>
                     </div>
                 </div>
             </div>

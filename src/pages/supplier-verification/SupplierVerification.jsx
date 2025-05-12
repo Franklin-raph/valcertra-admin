@@ -7,7 +7,7 @@ import { get } from "../../utils/axiosHelpers";
 // import FullPageLoader from "../../components/full-page-loader/FullPageLoader";
 import { useNavigate } from "react-router-dom";
 import { BsArrow90DegUp, BsEye } from "react-icons/bs";
-import { FiArrowUpRight } from "react-icons/fi";
+import { FiArrowDownRight, FiArrowUpRight } from "react-icons/fi";
 import Cookies from 'js-cookie';
 import { BiCalendar, BiMap, BiSearch } from "react-icons/bi";
 import { RiMap2Fill } from "react-icons/ri";
@@ -26,15 +26,9 @@ const SupplierVerification = () => {
     const [selectedTab, setSelectedTab] = useState(tabs[0])
 
     const getAllApplications = async () => {
-      const res = await fetch('https://vercertrabe.onrender.com/administration/applications/', {
-        headers : {
-            Authorization: `Bearer ${token}`
-        }
-      })
-      const data = await res.json()
-      console.log(res,data);
-      
-      setApplications(data)
+      const res = await get('/administration/applications/')
+      console.log(res);
+      setApplications(res)
     }
 
     const getSummary = async () => {
@@ -74,10 +68,18 @@ const SupplierVerification = () => {
                 <div>
                   <p className="text-text-color">Total Verifications</p>
                   <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.total_verification?.count}</p>
-                  <div className="flex items-center gap-2 text-[#039855] text-[12px]">
-                    <FiArrowUpRight />
-                    <p>+12% from last month</p>
-                  </div>
+                  {
+                    summary?.total_verification?.percent_change > 0 ?
+                      <div className="flex items-center gap-2 text-[#039855] text-[12px]">
+                        <FiArrowUpRight />
+                        <p> {summary?.total_verification?.percent_change} % from last month</p>
+                      </div>
+                    :
+                      <div className="flex items-center gap-2 text-[#F04438] text-[12px]">
+                        <FiArrowDownRight />
+                        <p> {summary?.total_verification?.percent_change} % from last month</p>
+                      </div>
+                  }
                 </div>
               </div>
               <div className="flex items-start gap-5 border border-[#CCE0FF] p-3 rounded-[4px]">
@@ -85,10 +87,18 @@ const SupplierVerification = () => {
                 <div>
                   <p className="text-text-color">Approved Verifications</p>
                   <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.approved_verification?.count}</p>
-                  <div className="flex items-center gap-2 text-[#039855] text-[12px]">
-                    <FiArrowUpRight />
-                    <p>+12% from last month</p>
-                  </div>
+                  {
+                    summary?.approved_verification?.percent_change > 0 ?
+                      <div className="flex items-center gap-2 text-[#039855] text-[12px]">
+                        <FiArrowUpRight />
+                        <p> {summary?.approved_verification?.percent_change} % from last month</p>
+                      </div>
+                    :
+                      <div className="flex items-center gap-2 text-[#F04438] text-[12px]">
+                        <FiArrowDownRight />
+                        <p> {summary?.approved_verification?.percent_change} % from last month</p>
+                      </div>
+                  }
                 </div>
               </div>
               <div className="flex items-start gap-5 border border-[#CCE0FF] p-3 rounded-[4px]">
@@ -96,10 +106,18 @@ const SupplierVerification = () => {
                 <div>
                   <p className="text-text-color">Pending Verifications</p>
                   <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.pending_verification?.count}</p>
-                  <div className="flex items-center gap-2 text-[#039855] text-[12px]">
-                    <FiArrowUpRight />
-                    <p>+12% from last month</p>
-                  </div>
+                  {
+                    summary?.pending_verification?.percent_change > 0 ?
+                      <div className="flex items-center gap-2 text-[#039855] text-[12px]">
+                        <FiArrowUpRight />
+                        <p> {summary?.pending_verification?.percent_change} % from last month</p>
+                      </div>
+                    :
+                      <div className="flex items-center gap-2 text-[#F04438] text-[12px]">
+                        <FiArrowDownRight />
+                        <p> {summary?.pending_verification?.percent_change} % from last month</p>
+                      </div>
+                  }
                 </div>
               </div>
               <div className="flex items-start gap-5 border border-[#CCE0FF] p-3 rounded-[4px]">
@@ -107,10 +125,18 @@ const SupplierVerification = () => {
                 <div>
                   <p className="text-text-color">Disapproved Verifications</p>
                   <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.disapproved_verification?.count}</p>
-                  <div className="flex items-center gap-2 text-[#039855] text-[12px]">
-                    <FiArrowUpRight />
-                    <p>+12% from last month</p>
-                  </div>
+                  {
+                    summary?.disapproved_verification?.percent_change > 0 ?
+                      <div className="flex items-center gap-2 text-[#039855] text-[12px]">
+                        <FiArrowUpRight />
+                        <p> {summary?.disapproved_verification?.percent_change} % from last month</p>
+                      </div>
+                    :
+                      <div className="flex items-center gap-2 text-[#F04438] text-[12px]">
+                        <FiArrowDownRight />
+                        <p> {summary?.disapproved_verification?.percent_change} % from last month</p>
+                      </div>
+                  }
                 </div>
               </div>
             </div>
@@ -213,44 +239,6 @@ const SupplierVerification = () => {
                   </div>
                 ))
               } */}
-            </div>
-
-            <div className="mt-12">
-                <div className="flex items-center justify-between px-3 pt-6 mb-4">
-                  <p className="text-[#333333]">Upcoming Field Audits</p>
-                  <p className="text-primary-color bg-secondary-color text-[14px] px-2 py-1 rounded-full cursor-pointer">View All</p>
-              </div>
-                {
-                    scheduledAudits?.length === 0 &&
-                    <div className="flex items-center justify-center mt-[5rem]">
-                        <p>No Scheduled Audits</p>
-                    </div>
-                }
-              {
-                scheduledAudits?.map((audit, index) => (
-                    <div key={index} className="flex items-center justify-between border rounded p-3">
-                        <div className="flex items-center gap-2">
-                            <p className="text-[#666666] font-[600] w-[50px]">AUD-2025-0128</p>
-                            <div>
-                                <p className="text-[#666666]">Afri-Agro Ltd</p>
-                                <div className="flex items-center gap-2 text-[#666666]">
-                                    <RiMap2Fill />
-                                    <p>Lagos, Nigeria</p>
-                                </div>
-                                <div className="flex items-center gap-2 text-[#666666]">
-                                    <BiCalendar />
-                                    <p>05/10/2025</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex flex-col justify-between items-end">
-                            <p className="text-[#B54708] px-[10px] py-[3px] rounded-full bg-[#FFFAEB] inline-block">Scheduled</p>
-                            <p></p>
-                            <p className="text-[#666666]">Auditor: James Okonkwo</p>
-                        </div>
-                    </div>
-                ))
-              }
             </div>
 
             {/* <div>

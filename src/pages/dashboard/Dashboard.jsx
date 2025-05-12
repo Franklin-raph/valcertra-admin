@@ -6,8 +6,8 @@ import SideNav from "../../components/side-nav/SideNav";
 import { get } from "../../utils/axiosHelpers";
 // import FullPageLoader from "../../components/full-page-loader/FullPageLoader";
 import { useNavigate } from "react-router-dom";
-import { BsArrow90DegUp } from "react-icons/bs";
-import { FiArrowUpRight } from "react-icons/fi";
+import { BsArrow90DegUp, BsEye } from "react-icons/bs";
+import { FiArrowDownRight, FiArrowUpRight } from "react-icons/fi";
 import Cookies from 'js-cookie';
 import { BiCalendar, BiMap } from "react-icons/bi";
 import { RiMap2Fill } from "react-icons/ri";
@@ -23,22 +23,31 @@ const Dashboard = () => {
     const navigate = useNavigate()
     const token = Cookies.get('token')
 
-    const getAllApplications = async () => {
-      const res = await fetch('https://vercertrabe.onrender.com/administration/applications/?view_current=true', {
-        headers : {
-            Authorization: `Bearer ${token}`
-        }
-      })
-      const data = await res.json()
-      console.log(res,data);
+    // const getAllApplications = async () => {
+    //   const res = await fetch('https://vercertrabe.onrender.com/administration/applications/?view_current=true', {
+    //     headers : {
+    //         Authorization: `Bearer ${token}`
+    //     }
+    //   })
+    //   const data = await res.json()
+    //   console.log(res,data);
       
-      setApplications(data)
+    // }
+    
+    const getAllApplications = async () => {
+      const res = await get('/administration/applications/?view_current=true')
+      console.log(res);
+      setApplications(res)
     }
 
     const getSummary = async () => {
-      const res = await get('/administration/application_summary')
-      setSummary(res.data)
-      console.log(res);
+      try {
+        const res = await get('/administration/summaries/application_reviewer_summary/')
+        setSummary(res.data)
+        console.log(res);
+      } catch (error) {
+        console.log(error);
+      }
     }
 
     const getScheduledAudits = async () => {
@@ -66,60 +75,81 @@ const Dashboard = () => {
           <TopNav setToggleNav={setToggleNav} toggleNav={toggleNav} />
           <div className="px-[10px] md:px-[30px] pb-[1rem] mt-[100px]">
 
-            <div className="grid grid-cols-5 gap-4 mt-7">
+            <div className="grid grid-cols-4 gap-4 mt-7">
               <div className="flex items-start gap-5 border border-[#CCE0FF] rounded-[4px] p-3">
                 <img src="./file.svg" alt="" />
                 <div>
                   <p className="text-text-color">Total Applications</p>
-                  <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.total_applications}</p>
-                  <div className="flex items-center gap-2 text-[#039855] text-[12px]">
-                    <FiArrowUpRight />
-                    <p>+12% from last month</p>
-                  </div>
+                  <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.total_application.count}</p>
+                  {
+                    summary?.total_application?.percent_change > 0 ?
+                      <div className="flex items-center gap-2 text-[#039855] text-[12px]">
+                        <FiArrowUpRight />
+                        <p> {summary?.total_application?.percent_change} % from last month</p>
+                      </div>
+                    :
+                      <div className="flex items-center gap-2 text-[#F04438] text-[12px]">
+                        <FiArrowDownRight />
+                        <p> {summary?.total_application?.percent_change} % from last month</p>
+                      </div>
+                  }
                 </div>
               </div>
               <div className="flex items-start gap-5 border border-[#CCE0FF] p-3 rounded-[4px]">
                 <img src="./approved.svg" alt="" />
                 <div>
                   <p className="text-text-color">Approved Applications</p>
-                  <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.approved_applications}</p>
-                  <div className="flex items-center gap-2 text-[#039855] text-[12px]">
-                    <FiArrowUpRight />
-                    <p>+12% from last month</p>
-                  </div>
+                  <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.approved_application?.count}</p>
+                  {
+                    summary?.approved_application?.percent_change > 0 ?
+                      <div className="flex items-center gap-2 text-[#039855] text-[12px]">
+                        <FiArrowUpRight />
+                        <p> {summary?.approved_application?.percent_change} % from last month</p>
+                      </div>
+                    :
+                      <div className="flex items-center gap-2 text-[#F04438] text-[12px]">
+                        <FiArrowDownRight />
+                        <p> {summary?.approved_application?.percent_change} % from last month</p>
+                      </div>
+                  }
                 </div>
               </div>
               <div className="flex items-start gap-5 border border-[#CCE0FF] p-3 rounded-[4px]">
                 <img src="./pending.svg" alt="" />
                 <div>
                   <p className="text-text-color">Pending Applications</p>
-                  <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.pending_applications}</p>
-                  <div className="flex items-center gap-2 text-[#039855] text-[12px]">
-                    <FiArrowUpRight />
-                    <p>+12% from last month</p>
-                  </div>
+                  <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.pending_application?.count}</p>
+                  {
+                    summary?.pending_application?.percent_change > 0 ?
+                      <div className="flex items-center gap-2 text-[#039855] text-[12px]">
+                        <FiArrowUpRight />
+                        <p> {summary?.pending_application?.percent_change} % from last month</p>
+                      </div>
+                    :
+                      <div className="flex items-center gap-2 text-[#F04438] text-[12px]">
+                        <FiArrowDownRight />
+                        <p> {summary?.pending_application?.percent_change} % from last month</p>
+                      </div>
+                  }
                 </div>
               </div>
               <div className="flex items-start gap-5 border border-[#CCE0FF] p-3 rounded-[4px]">
                 <img src="./info.svg" alt="" />
                 <div>
                   <p className="text-text-color">Rejected Applications</p>
-                  <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.rejected_applications}</p>
-                  <div className="flex items-center gap-2 text-[#039855] text-[12px]">
-                    <FiArrowUpRight />
-                    <p>+12% from last month</p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-start gap-5 border border-[#CCE0FF] p-3 rounded-[4px]">
-                <img src="./approved.svg" alt="" />
-                <div>
-                  <p className="text-text-color">Applications Under Review</p>
-                  <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.under_review_applications}</p>
-                  <div className="flex items-center gap-2 text-[#039855] text-[12px]">
-                    <FiArrowUpRight />
-                    <p>+12% from last month</p>
-                  </div>
+                  <p className="text-[#333333] font-[500] text-[20px] my-2">{summary?.disapproved_application?.count}</p>
+                  {
+                    summary?.disapproved_application?.percent_change > 0 ?
+                      <div className="flex items-center gap-2 text-[#039855] text-[12px]">
+                        <FiArrowUpRight />
+                        <p> {summary?.disapproved_application?.percent_change} % from last month</p>
+                      </div>
+                    :
+                      <div className="flex items-center gap-2 text-[#F04438] text-[12px]">
+                        <FiArrowDownRight />
+                        <p> {summary?.disapproved_application?.percent_change} % from last month</p>
+                      </div>
+                  }
                 </div>
               </div>
             </div>
