@@ -184,8 +184,8 @@ const Dashboard = () => {
                             applications?.data?.map((application, index) => (
                                 <tr className="border-b" key={index}>
                                     <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] flex gap-1 items-center">{application.application_number}</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">Concrete Mix</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">26 Apr 2025</td>
+                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application?.user?.company_data?.company_name ? application?.user.company_data?.company_name : "Nill"}</td>
+                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application?.user.company_data?.reg_country ? application?.user.company_data?.reg_country : "Nill"}</td>
                                     <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application.product_name}</td>
                                     <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] capitalize">{application.current_review_stage}</td>
                                     <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">#70,000</td>

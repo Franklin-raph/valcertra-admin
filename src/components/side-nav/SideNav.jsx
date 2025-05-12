@@ -30,14 +30,14 @@ const SideNav = ({toggleNav, setToggleNav}) => {
             <img src="./dashboard-logo.svg" className='mx-auto mt-[20px]' alt="" />
             <p onClick={() => setToggleNav(false)} className='text-white text-[22px] cursor-pointer lg:hidden block'>&times;</p>
         </div>
-        <div className="pl-[32px] my-5 text-white text-[17px] ml-[30px]">
+        <div className="pl-[32px] my-5 text-white text-[17px] ml-[20px] flex flex-col gap-3">
           <Link to='/dashboard' className={ location.pathname.includes('dashboard') ? `flex items-center justify-between py-[10px] text-[#fff] border-r-[3px] w-full` :`text-[#D0D5DD] flex items-center justify-between py-[10px]`}>
             <div className="flex items-center gap-2">
               <RxDashboard />
               <p className="">Dashboard</p>
             </div>
           </Link>
-          <Link to='/applications' className={ location.pathname.includes('application') ? `flex items-center justify-between py-[10px] text-[#fff] border-r-[3px] w-full` :`text-[#D0D5DD] flex items-center justify-between py-[10px]`}>
+          <Link to='/applications' className={ location.pathname.includes('applications') ? `flex items-center justify-between py-[10px] text-[#fff] border-r-[3px] w-full` :`text-[#D0D5DD] flex items-center justify-between py-[10px]`}>
             <div className="flex items-center gap-2">
                 <FiFileText />
                 <p className="">Applications</p>
@@ -86,7 +86,7 @@ const SideNav = ({toggleNav, setToggleNav}) => {
             </div>
           </Link>
         </div>
-        <div className="pl-[32px] my-5 text-white text-[17px] ml-[30px] mt-[13.5rem]">
+        <div className="pl-[32px] my-5 text-white text-[17px] ml-[30px] mt-[9rem]">
           <button className='text-[#D0D5DD] flex items-center justify-between py-[10px]' onClick={() => setLogoutModal(true)}>
             <div className="flex items-center gap-2">
                 <img src="./logout.svg" alt="" />

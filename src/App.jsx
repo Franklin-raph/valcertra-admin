@@ -13,6 +13,8 @@ import Staffs from './pages/staffs/Staffs'
 import StaffProfile from './pages/staff-profile/StaffProfile'
 import MyProfile from './pages/my-profile/MyProfile'
 import Certifications from './pages/certifications/Certifications'
+import ApplicationView from './pages/application-view/ApplicationView'
+import AuditApplicationView from './pages/audit-application-view/AuditApplicationView'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -30,6 +32,8 @@ function App() {
         <Route path='/my-profile' element={<MyProfile />}/>
         <Route path='/certifications' element={<Certifications />}/>
         <Route path='/analytics' element={<Certifications />}/>
+        <Route path='/applications/:id' element={<ApplicationView />}/>
+        <Route path='/audit/application/:id' element={<AuditApplicationView />}/>
         <Route path='/product-price' element={<ProductPrice />}/>
       </Routes>
     </HashRouter>

@@ -1,16 +1,11 @@
 import React, { useState, useEffect } from "react";
 import TopNav from "../../components/top-nav/TopNav";
 import SideNav from "../../components/side-nav/SideNav";
-// import ValueAdditionCalculator from "../../components/value-addition-calculator/ValueAdditionCalculator";
-// import CertificateApplication from "../../components/certificate-application/CertificateApplication";
 import { get } from "../../utils/axiosHelpers";
-// import FullPageLoader from "../../components/full-page-loader/FullPageLoader";
 import { useNavigate } from "react-router-dom";
-import { BsArrow90DegUp } from "react-icons/bs";
 import { FiArrowUpRight } from "react-icons/fi";
 import Cookies from 'js-cookie';
-import { BiCalendar, BiMap, BiSearch } from "react-icons/bi";
-import { RiMap2Fill } from "react-icons/ri";
+import { BiSearch } from "react-icons/bi";
 
 
 const Certifications = () => {

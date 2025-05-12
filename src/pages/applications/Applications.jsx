@@ -1,16 +1,11 @@
 import React, { useState, useEffect } from "react";
 import TopNav from "../../components/top-nav/TopNav";
 import SideNav from "../../components/side-nav/SideNav";
-// import ValueAdditionCalculator from "../../components/value-addition-calculator/ValueAdditionCalculator";
-// import CertificateApplication from "../../components/certificate-application/CertificateApplication";
 import { get } from "../../utils/axiosHelpers";
-// import FullPageLoader from "../../components/full-page-loader/FullPageLoader";
 import { useNavigate } from "react-router-dom";
-import { BsArrow90DegUp, BsEye } from "react-icons/bs";
+import { BsEye } from "react-icons/bs";
 import { FiArrowDownRight, FiArrowUpRight } from "react-icons/fi";
-import Cookies from 'js-cookie';
-import { BiCalendar, BiMap, BiSearch } from "react-icons/bi";
-import { RiMap2Fill } from "react-icons/ri";
+import { BiSearch } from "react-icons/bi";
 
 
 const Applications = () => {
@@ -21,12 +16,11 @@ const Applications = () => {
     const [scheduledAudits, setScheduledAudits] = useState()
     const [isLoading, setIsLoading] = useState(true)
     const navigate = useNavigate()
-    const token = Cookies.get('token')
     const tabs = ["New Applications", "Approved", "Disapproved"]
     const [selectedTab, setSelectedTab] = useState(tabs[0])
     
     const getAllApplications = async () => {
-      const res = await get('/administration/applications/')
+      const res = await get('/administration/applications/?current_review_stage=application_verification')
       console.log(res);
       setApplications(res)
     }
@@ -183,13 +177,13 @@ const Applications = () => {
                             applications?.data?.map((application, index) => (
                                 <tr className="border-b" key={index}>
                                     <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] flex gap-1 items-center">{application.application_number}</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">Concrete Mix</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">26 Apr 2025</td>
+                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application?.user?.company_data?.company_name ? application?.user.company_data?.company_name : "Nill"}</td>
+                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application?.user.company_data?.reg_country ? application?.user.company_data?.reg_country : "Nill"}</td>
                                     <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application.product_name}</td>
                                     <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] capitalize">{application.current_review_stage}</td>
                                     <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">#70,000</td>
                                     <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{ new Date(application.created_at).toLocaleDateString() }</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] cursor-pointer"> <BsEye /> </td>
+                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] cursor-pointer"> <BsEye onClick={() => navigate(`/applications/${application.id}`)}/> </td>
                                 </tr>
                             ))
                         }

@@ -3,13 +3,12 @@ import TopNav from "../../components/top-nav/TopNav";
 import SideNav from "../../components/side-nav/SideNav";
 import { get } from "../../utils/axiosHelpers";
 import { useNavigate } from "react-router-dom";
-import { BsArrow90DegUp, BsEye } from "react-icons/bs";
+import { BsEye } from "react-icons/bs";
 import { FiArrowDownRight, FiArrowUpRight } from "react-icons/fi";
 import Cookies from 'js-cookie';
 import { BiCalendar, BiMap, BiSearch } from "react-icons/bi";
 import { RiMap2Fill } from "react-icons/ri";
 import ScheduleAnAudit from "../../components/shedule-an-audit/ScheduleAnAudit";
-
 
 const AuditManagement = () => {
 
@@ -20,7 +19,6 @@ const AuditManagement = () => {
     const [auditsInProgress, setAuditsInProgress] = useState()
     const [isLoading, setIsLoading] = useState(true)
     const navigate = useNavigate()
-    const token = Cookies.get('token')
     const tabs = ["Pending Audits", "Scheduled Audits", "Completed Audits"]
     const [selectedTab, setSelectedTab] = useState(tabs[0])
     const [scheduleAnAudit, setScheduleAnAudit] = useState(false)
@@ -239,10 +237,10 @@ const AuditManagement = () => {
                             <div className="flex items-center gap-2">
                                 <p className="text-[#666666] font-[600] w-[55px]">AUD-{audit?.scheduled_date}</p>
                                 <div>
-                                    <p className="text-[#666666]">Afri-Agro Ltd</p>
+                                    <p className="text-[#666666]">{audit?.application?.user?.company_data?.name ? audit?.application?.user?.company_data?.name : 'Nill'}</p>
                                     <div className="flex items-center gap-2 text-[#666666]">
                                         <RiMap2Fill />
-                                        <p>Lagos, Nigeria</p>
+                                        <p>{audit?.application?.user?.company_data?.head_office_country ? audit?.application?.user?.company_data?.head_office_country : 'Nill'}, {audit?.application?.user?.company_data?.head_office_state_province_region ? audit?.application?.user?.company_data?.head_office_state_province_region : 'Nill'}</p>
                                     </div>
                                     <div className="flex items-center gap-2 text-[#666666]">
                                         <BiCalendar />
@@ -305,16 +303,16 @@ const AuditManagement = () => {
                                 {
                                     applications?.data?.map((application, index) => (
                                         <tr className="border-b" key={index}>
-                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] flex gap-1 items-center">{application.application_number}</td>
-                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application.user.company_data?.company_name ? application.user.company_data?.company_name : "N/A"}</td>
-                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application.user.company_data?.reg_country ? application.user.company_data?.reg_country : "N/A"}</td>
-                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application.product_name}</td>
+                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] flex gap-1 items-center">{application?.application_number}</td>
+                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application?.user?.company_data?.company_name ? application?.user.company_data?.company_name : "Nill"}</td>
+                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application?.user.company_data?.reg_country ? application?.user.company_data?.reg_country : "Nill"}</td>
+                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application?.product_name}</td>
                                             <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] capitalize">{application?.status}</td>
                                             <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">A1</td>
                                             <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">Nill</td>
                                             <td className="px-6 py-4 text-[16px] md:text-[16px] text-[#475467] flex items-center gap-4">
                                               <BiCalendar className="cursor-pointer"/>
-                                              <BsEye className="cursor-pointer"/>
+                                              <BsEye onClick={() => navigate(`/audit/application/${application.id}`)} className="cursor-pointer"/>
                                             </td>
                                         </tr>
                                     ))

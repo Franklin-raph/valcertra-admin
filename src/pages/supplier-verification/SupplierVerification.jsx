@@ -26,7 +26,7 @@ const SupplierVerification = () => {
     const [selectedTab, setSelectedTab] = useState(tabs[0])
 
     const getAllApplications = async () => {
-      const res = await get('/administration/applications/')
+      const res = await get('/administration/applications/?current_review_stage=document_verification')
       console.log(res);
       setApplications(res)
     }
