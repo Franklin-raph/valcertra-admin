@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { FiArrowUpRight } from "react-icons/fi";
 import Cookies from 'js-cookie';
 import { BiSearch } from "react-icons/bi";
+import { BsEye } from "react-icons/bs";
 
 
 const Certifications = () => {
@@ -13,23 +14,15 @@ const Certifications = () => {
     const [toggleNav, setToggleNav] = useState(false)
     const [applications, setApplications] = useState()
     const [summary, setSummary] = useState()
-    const [scheduledAudits, setScheduledAudits] = useState()
     const [isLoading, setIsLoading] = useState(true)
     const navigate = useNavigate()
-    const token = Cookies.get('token')
     const tabs = ["Pending Approval", "Approved Application", "Rejected Application", "Certified Applications"]
     const [selectedTab, setSelectedTab] = useState(tabs[0])
 
     const getAllApplications = async () => {
-      const res = await fetch('https://vercertrabe.onrender.com/administration/applications/', {
-        headers : {
-            Authorization: `Bearer ${token}`
-        }
-      })
-      const data = await res.json()
-      console.log(res,data);
-      
-      setApplications(data)
+      const res = await get('/administration/applications/?current_review_stage=certification')
+      console.log(res);
+      setApplications(res)
     }
 
     const getSummary = async () => {
@@ -130,28 +123,39 @@ const Certifications = () => {
                 }
               <div class="relative overflow-x-auto mt-8">
                 <table class="w-full text-sm text-left rtl:text-left">
-                    <thead class="text-[12px] md:text-[14px] bg-[#F9FAFB] text-[#475467]">
+                    <thead class="text-[12px] bg-[#F9FAFB] text-[#475467]">
                         <tr>
                             <th scope="col" class="px-6 py-3 font-[600] flex gap-1 items-center">Application ID</th>
                             <th scope="col" class="px-6 py-3 font-[600]">Company</th>
                             <th scope="col" class="px-6 py-3 font-[600]">Country</th>
                             <th scope="col" class="px-6 py-3 font-[600]">Product Name</th>
-                            <th scope="col" class="px-2 py-3 font-[600]">Status</th>
-                            <th scope="col" class="px-2 py-3 font-[600]">AI Score</th>
-                            <th scope="col" class="px-2 py-3 font-[600]">Date</th>
+                            <th scope="col" class="px-6 py-3 font-[600]">Status</th>
+                            <th scope="col" class="px-6 py-3 font-[600]">AI Score</th>
+                            <th scope="col" class="px-6 py-3 font-[600]">Date</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {
+                      {
                             applications?.data?.map((application, index) => (
                                 <tr className="border-b" key={index}>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#101828] flex gap-1 items-center">{application.application_number}</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">Concrete Mix</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">26 Apr 2025</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#101828]">{application.product_name}</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#101828]">#70,000</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#101828]">#70,000</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#101828]">{ new Date(application.created_at).toLocaleDateString() }</td>
+                                    <td class="px-6 py-4 text-[12px] text-[#475467] flex gap-1 items-center">{application.application_number}</td>
+                                    <td class="px-6 py-4 text-[12px] text-[#475467]">{application?.user?.company_data?.company_name ? application?.user.company_data?.company_name : "Nill"}</td>
+                                    <td class="px-6 py-4 text-[12px] text-[#475467]">{application?.user.company_data?.reg_country ? application?.user.company_data?.reg_country : "Nill"}</td>
+                                    <td class="px-6 py-4 text-[12px] text-[#475467]">{application?.product_name}</td>
+                                    <td class="px-6 py-4 text-[12px] text-[#475467] capitalize">{application.current_review_stage}</td>
+                                    <td class="px-6 py-4 text-[12px] text-[#475467]">
+                                      {
+                                        application?.ai_score === 'high'?
+                                        <span className="text-[#B42318] bg-[#FEF3F2] px-2 py-1 rounded-full">AI Risk: {application?.ai_score}</span>
+                                        :
+                                        application?.ai_score === 'medium' ?
+                                        <span className="bg-[#FFFAEB] text-[#B54708] px-2 py-1 rounded-full">AI Risk: {application?.ai_score}</span>
+                                        :
+                                        <span className="bg-[#ECFDF3] text-[#027A48] px-2 py-1 rounded-full">AI Risk: {application?.ai_score}</span>
+                                      }
+                                    </td>
+                                    <td class="px-6 py-4 text-[12px] text-[#475467]">{ new Date(application?.created_at).toLocaleDateString() }</td>
+                                    <td class="px-6 py-4 text-[12px] text-[#475467] cursor-pointer"> <BsEye onClick={() => navigate(`/applications/${application.id}`)}/> </td>
                                 </tr>
                             ))
                         }

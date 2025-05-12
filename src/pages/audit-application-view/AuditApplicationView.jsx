@@ -42,14 +42,14 @@ const AuditApplicationView = () => {
           <div className="px-[10px] md:px-[30px] pb-[1rem] mt-[100px]">
             <div className="flex items-center gap-4">
                 {
-                    applicationInfo?.status === 'pending' ?
+                    applicationInfo?.document_verification === 'pending' ?
                     (
                     <div className="flex items-center gap-2 bg-[#FFFAEB] rounded-full py-[6px] px-[10px]">
                         <img src="./clock.svg" alt="" className="w-[16px]" />
                         <p className="text-[14px] text-[#B54708] font-[500]">Pending</p>
                     </div>
                     ) :
-                    applicationInfo?.status === 'under_review' ?
+                    applicationInfo?.document_verification === 'application_verification' ?
                     (
                     <div className="flex items-center gap-2 bg-[#FFFAEB] rounded-full py-[6px] px-[10px]">
                         <img src="./clock.svg" alt="" className="w-[16px]" />
@@ -57,7 +57,7 @@ const AuditApplicationView = () => {
                     </div>
                     )
                     :
-                    applicationInfo?.status === 'rejected' ?
+                    applicationInfo?.document_verification === 'rejected' ?
                     (
                     <div className="flex items-center gap-2 bg-[#FEF3F2] rounded-full py-[6px] px-[10px]">
                         <img src="./x-circle.svg" alt="" className="w-[16px]" />

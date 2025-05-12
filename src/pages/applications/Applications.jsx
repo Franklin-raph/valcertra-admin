@@ -160,7 +160,7 @@ const Applications = () => {
                 }
               <div class="relative overflow-x-auto mt-8">
                 <table class="w-full text-sm text-left rtl:text-left">
-                    <thead class="text-[12px] md:text-[14px] bg-[#F9FAFB] text-[#475467]">
+                    <thead class="text-[12px] bg-[#F9FAFB] text-[#475467]">
                         <tr>
                             <th scope="col" class="px-6 py-3 font-[600] flex gap-1 items-center">Application ID</th>
                             <th scope="col" class="px-6 py-3 font-[600]">Company</th>
@@ -176,14 +176,24 @@ const Applications = () => {
                       {
                             applications?.data?.map((application, index) => (
                                 <tr className="border-b" key={index}>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] flex gap-1 items-center">{application.application_number}</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application?.user?.company_data?.company_name ? application?.user.company_data?.company_name : "Nill"}</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application?.user.company_data?.reg_country ? application?.user.company_data?.reg_country : "Nill"}</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application.product_name}</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] capitalize">{application.current_review_stage}</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">#70,000</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{ new Date(application.created_at).toLocaleDateString() }</td>
-                                    <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] cursor-pointer"> <BsEye onClick={() => navigate(`/applications/${application.id}`)}/> </td>
+                                    <td class="px-6 py-4 text-[12px] text-[#475467] flex gap-1 items-center">{application.application_number}</td>
+                                    <td class="px-6 py-4 text-[12px] text-[#475467]">{application?.user?.company_data?.company_name ? application?.user.company_data?.company_name : "Nill"}</td>
+                                    <td class="px-6 py-4 text-[12px] text-[#475467]">{application?.user.company_data?.reg_country ? application?.user.company_data?.reg_country : "Nill"}</td>
+                                    <td class="px-6 py-4 text-[12px] text-[#475467]">{application?.product_name}</td>
+                                    <td class="px-6 py-4 text-[12px] text-[#475467] capitalize">{application.current_review_stage}</td>
+                                    <td class="px-6 py-4 text-[12px] text-[#475467]">
+                                      {
+                                        application?.ai_score === 'high'?
+                                        <span className="text-[#B42318] bg-[#FEF3F2] px-2 py-1 rounded-full">AI Risk: {application?.ai_score}</span>
+                                        :
+                                        application?.ai_score === 'medium' ?
+                                        <span className="bg-[#FFFAEB] text-[#B54708] px-2 py-1 rounded-full">AI Risk: {application?.ai_score}</span>
+                                        :
+                                        <span className="bg-[#ECFDF3] text-[#027A48] px-2 py-1 rounded-full">AI Risk: {application?.ai_score}</span>
+                                      }
+                                    </td>
+                                    <td class="px-6 py-4 text-[12px] text-[#475467]">{ new Date(application?.created_at).toLocaleDateString() }</td>
+                                    <td class="px-6 py-4 text-[12px] text-[#475467] cursor-pointer"> <BsEye onClick={() => navigate(`/applications/${application.id}`)}/> </td>
                                 </tr>
                             ))
                         }

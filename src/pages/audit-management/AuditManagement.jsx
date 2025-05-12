@@ -16,6 +16,7 @@ const AuditManagement = () => {
     const [applications, setApplications] = useState()
     const [summary, setSummary] = useState()
     const [audits, setAudits] = useState()
+    const [completedAudits, setCompletedAudits] = useState()
     const [auditsInProgress, setAuditsInProgress] = useState()
     const [isLoading, setIsLoading] = useState(true)
     const navigate = useNavigate()
@@ -65,6 +66,7 @@ const AuditManagement = () => {
 
     const getCompletedAudits = async () => {
       const res = await get('/administration/audit-schedules/?status=completed')
+      setCompletedAudits(res)
       setCompletedAuditsCount(res.count)
       console.log("Completed audits:", res);
       return res;
@@ -287,7 +289,7 @@ const AuditManagement = () => {
                     ) : (
                       <div className="relative overflow-x-auto mt-8">
                         <table className="w-full text-sm text-left rtl:text-left">
-                            <thead className="text-[12px] md:text-[14px] bg-[#F9FAFB] text-[#475467]">
+                            <thead className="text-[12px] bg-[#F9FAFB] text-[#475467]">
                                 <tr>
                                     <th scope="col" className="px-6 py-3 font-[600] flex gap-1 items-center">Application ID</th>
                                     <th scope="col" className="px-6 py-3 font-[600]">Company</th>
@@ -303,14 +305,24 @@ const AuditManagement = () => {
                                 {
                                     applications?.data?.map((application, index) => (
                                         <tr className="border-b" key={index}>
-                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] flex gap-1 items-center">{application?.application_number}</td>
-                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application?.user?.company_data?.company_name ? application?.user.company_data?.company_name : "Nill"}</td>
-                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application?.user.company_data?.reg_country ? application?.user.company_data?.reg_country : "Nill"}</td>
-                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application?.product_name}</td>
-                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] capitalize">{application?.status}</td>
-                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">A1</td>
-                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">Nill</td>
-                                            <td className="px-6 py-4 text-[16px] md:text-[16px] text-[#475467] flex items-center gap-4">
+                                            <td className="px-6 py-4 text-[12px] text-[#475467] flex gap-1 items-center">{application?.application_number}</td>
+                                            <td className="px-6 py-4 text-[12px] text-[#475467]">{application?.user?.company_data?.company_name ? application?.user.company_data?.company_name : "Nill"}</td>
+                                            <td className="px-6 py-4 text-[12px] text-[#475467]">{application?.user.company_data?.reg_country ? application?.user.company_data?.reg_country : "Nill"}</td>
+                                            <td className="px-6 py-4 text-[12px] text-[#475467]">{application?.product_name}</td>
+                                            <td className="px-6 py-4 text-[12px] text-[#475467] capitalize">{application?.status}</td>
+                                            <td class="px-6 py-4 text-[12px] text-[#475467]">
+                                              {
+                                                application?.ai_score === 'high'?
+                                                <span className="text-[#B42318] bg-[#FEF3F2] px-2 py-1 rounded-full">AI Risk: {application?.ai_score}</span>
+                                                :
+                                                application?.ai_score === 'medium' ?
+                                                <span className="bg-[#FFFAEB] text-[#B54708] px-2 py-1 rounded-full">AI Risk: {application?.ai_score}</span>
+                                                :
+                                                <span className="bg-[#ECFDF3] text-[#027A48] px-2 py-1 rounded-full">AI Risk: {application?.ai_score}</span>
+                                              }
+                                            </td>
+                                            <td className="px-6 py-4 text-[12px] text-[#475467]">{ new Date(application?.updated_at).toDateString()}</td>
+                                            <td className="px-6 py-4 text-[16px] text-[#475467] flex items-center gap-4">
                                               <BiCalendar className="cursor-pointer"/>
                                               <BsEye onClick={() => navigate(`/audit/application/${application.id}`)} className="cursor-pointer"/>
                                             </td>
@@ -333,7 +345,7 @@ const AuditManagement = () => {
                     ) : (
                       <div className="relative overflow-x-auto mt-8">
                         <table className="w-full text-sm text-left rtl:text-left">
-                            <thead className="text-[12px] md:text-[14px] bg-[#F9FAFB] text-[#475467]">
+                            <thead className="text-[12px] bg-[#F9FAFB] text-[#475467]">
                                 <tr>
                                     <th scope="col" className="px-6 py-3 font-[600] flex gap-1 items-center">Application ID</th>
                                     <th scope="col" className="px-6 py-3 font-[600]">Company</th>
@@ -348,13 +360,23 @@ const AuditManagement = () => {
                                 {
                                     audits?.data?.map((audit, index) => (
                                         <tr className="border-b" key={index}>
-                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] flex gap-1 items-center">{audit.application.application_number}</td>
-                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{audit.application.user.company_data?.company_name ? audit.application.user.company_data?.company_name : "N/A"}</td>
-                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{audit.application.user.company_data?.reg_country ? audit.application.user.company_data?.reg_country : "N/A"}</td>
-                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{audit.application.product_name}</td>
-                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] capitalize">{audit.status}</td>
-                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">A1</td>
-                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{ new Date(audit.scheduled_date).toLocaleDateString() }</td>
+                                            <td className="px-6 py-4 text-[12px] text-[#475467] flex gap-1 items-center">{audit.application.application_number}</td>
+                                            <td className="px-6 py-4 text-[12px] text-[#475467]">{audit.application.user.company_data?.company_name ? audit.application.user.company_data?.company_name : "N/A"}</td>
+                                            <td className="px-6 py-4 text-[12px] text-[#475467]">{audit.application.user.company_data?.reg_country ? audit.application.user.company_data?.reg_country : "N/A"}</td>
+                                            <td className="px-6 py-4 text-[12px] text-[#475467]">{audit.application.product_name}</td>
+                                            <td className="px-6 py-4 text-[12px] text-[#475467] capitalize">{audit.status}</td>
+                                            <td class="px-6 py-4 text-[12px] text-[#475467]">
+                                              {
+                                                audit?.application?.ai_score === 'high'?
+                                                <span className="text-[#B42318] bg-[#FEF3F2] px-2 py-1 rounded-full">AI Risk: {audit?.application?.ai_score}</span>
+                                                :
+                                                audit?.application?.ai_score === 'medium' ?
+                                                <span className="bg-[#FFFAEB] text-[#B54708] px-2 py-1 rounded-full">AI Risk: {audit?.application?.ai_score}</span>
+                                                :
+                                                <span className="bg-[#ECFDF3] text-[#027A48] px-2 py-1 rounded-full">AI Risk: {audit?.application?.ai_score}</span>
+                                              }
+                                            </td>
+                                            <td className="px-6 py-4 text-[12px] text-[#475467]">{ new Date(audit.scheduled_date).toLocaleDateString() }</td>
                                         </tr>
                                     ))
                                 }
@@ -366,10 +388,61 @@ const AuditManagement = () => {
                 )}
 
                 {selectedTab === "Completed Audits" && (
+                  <>
+                    {completedAudits?.data?.length === 0 ? (
+                      <div className="flex items-center justify-center mt-[5rem] mb-5">
+                        <p>No Completed Audits</p>
+                      </div>
+                    ) : (
+                      <div className="relative overflow-x-auto mt-8">
+                        <table className="w-full text-sm text-left rtl:text-left">
+                            <thead className="text-[12px] bg-[#F9FAFB] text-[#475467]">
+                                <tr>
+                                    <th scope="col" className="px-6 py-3 font-[600] flex gap-1 items-center">Application ID</th>
+                                    <th scope="col" className="px-6 py-3 font-[600]">Company</th>
+                                    <th scope="col" className="px-6 py-3 font-[600]">Country</th>
+                                    <th scope="col" className="px-6 py-3 font-[600]">Product Name</th>
+                                    <th scope="col" className="px-6 py-3 font-[600]">Status</th>
+                                    <th scope="col" className="px-6 py-3 font-[600]">AI Score</th>
+                                    <th scope="col" className="px-6 py-3 font-[600]">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    completedAudits?.data?.map((audit, index) => (
+                                        <tr className="border-b" key={index}>
+                                            <td className="px-6 py-4 text-[12px] text-[#475467] flex gap-1 items-center">{audit.application.application_number}</td>
+                                            <td className="px-6 py-4 text-[12px] text-[#475467]">{audit.application.user.company_data?.company_name ? audit.application.user.company_data?.company_name : "N/A"}</td>
+                                            <td className="px-6 py-4 text-[12px] text-[#475467]">{audit.application.user.company_data?.reg_country ? audit.application.user.company_data?.reg_country : "N/A"}</td>
+                                            <td className="px-6 py-4 text-[12px] text-[#475467]">{audit.application.product_name}</td>
+                                            <td className="px-6 py-4 text-[12px] text-[#475467] capitalize">{audit.status}</td>
+                                            <td class="px-6 py-4 text-[12px] text-[#475467]">
+                                              {
+                                                audit?.application?.ai_score === 'high'?
+                                                <span className="text-[#B42318] bg-[#FEF3F2] px-2 py-1 rounded-full">AI Risk: {audit?.application?.ai_score}</span>
+                                                :
+                                                audit?.application?.ai_score === 'medium' ?
+                                                <span className="bg-[#FFFAEB] text-[#B54708] px-2 py-1 rounded-full">AI Risk: {audit?.application?.ai_score}</span>
+                                                :
+                                                <span className="bg-[#ECFDF3] text-[#027A48] px-2 py-1 rounded-full">AI Risk: {audit?.application?.ai_score}</span>
+                                              }
+                                            </td>
+                                            <td className="px-6 py-4 text-[12px] text-[#475467]">{ new Date(audit.scheduled_date).toLocaleDateString() }</td>
+                                        </tr>
+                                    ))
+                                }
+                            </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* {selectedTab === "Completed Audits" && (
                   <div className="flex items-center justify-center mt-[5rem] mb-5">
                     <p>Completed Audits Table Would Go Here</p>
                   </div>
-                )}
+                )} */}
             </div>
           </div>
         </div>

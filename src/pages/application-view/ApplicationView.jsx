@@ -4,6 +4,7 @@ import SideNav from "../../components/side-nav/SideNav";
 import { get, post } from "../../utils/axiosHelpers";
 import { useParams } from "react-router-dom";
 import Alert from "../../components/alert/Alert";
+import BtnLoader from "../../components/btnLoader/BtnLoader";
 // import FullPageLoader from "../../components/full-page-loader/FullPageLoader";
 
 
@@ -44,7 +45,7 @@ const ApplicationView = () => {
         }
         try {
             setLoading(true)
-            const res = await post('/administration/application-review/', {calculated_value_addition, comment})
+            const res = await post('/administration/application-review/', {calculated_value_addition, comment, application:id, review_type:'application_verification',approved: true})
             setMsg(res.message)
             setAlertType('success')
         } catch (error) {
@@ -488,10 +489,18 @@ const ApplicationView = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="mt-12 flex items-center gap-4 justify-end mr-[22px]">
-                                <button className="border-[#FDA29B] border text-[#B42318] py-2 px-4 rounded-[4px]">Disapprove</button>
-                                <button onClick={approveDocument} className="bg-primary-color py-2 px-4 rounded-[4px] text-white">Approve and Proceed to Next Stage</button>
-                            </div>
+                            {
+                                loading ?
+                                <div className="mt-12 flex items-center gap-4 justify-end mr-[22px]">
+                                    <BtnLoader />
+                                </div>
+                                :
+                                <div className="mt-12 flex items-center gap-4 justify-end mr-[22px]">
+                                    <button className="border-[#FDA29B] border text-[#B42318] py-2 px-4 rounded-[4px]">Disapprove</button>
+                                    <button onClick={approveDocument} className="bg-primary-color py-2 px-4 rounded-[4px] text-white">Approve and Proceed to Next Stage</button>
+                                </div>
+
+                            }
                         </div>
                     </div>
                 }
