@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TopNav from "../../components/top-nav/TopNav";
 import SideNav from "../../components/side-nav/SideNav";
-// import ValueAdditionCalculator from "../../components/value-addition-calculator/ValueAdditionCalculator";
-// import CertificateApplication from "../../components/certificate-application/CertificateApplication";
 import { get } from "../../utils/axiosHelpers";
-// import FullPageLoader from "../../components/full-page-loader/FullPageLoader";
 import { useNavigate } from "react-router-dom";
 import { BsArrow90DegUp, BsEye } from "react-icons/bs";
 import { FiArrowDownRight, FiArrowUpRight } from "react-icons/fi";
@@ -28,49 +25,111 @@ const AuditManagement = () => {
     const [selectedTab, setSelectedTab] = useState(tabs[0])
     const [scheduleAnAudit, setScheduleAnAudit] = useState(false)
     const [staffs, setStaffs] = useState()
-    const [currentCount, setCurrentCount] = useState()
+    
+    // Create separate count states for each data type
+    const [applicationsCount, setApplicationsCount] = useState(0)
+    const [auditsCount, setAuditsCount] = useState(0)
+    const [completedAuditsCount, setCompletedAuditsCount] = useState(0)
+    
+    // Determine which count to display based on selected tab
+    const getCurrentCount = () => {
+      switch(selectedTab) {
+        case "Pending Audits":
+          return applicationsCount;
+        case "Scheduled Audits":
+          return auditsCount;
+        case "Completed Audits":
+          return completedAuditsCount;
+        default:
+          return 0;
+      }
+    }
 
     const getAllApplications = async () => {
       const res = await get('/administration/applications/')
-      console.log(res);
-      setCurrentCount(res.count)
+      console.log("Applications data:", res);
       setApplications(res)
+      setApplicationsCount(res.count)
     }
     
     const getSummary = async () => {
       const res = await get('/administration/summaries/audit_summary/')
       setSummary(res.data)
-      console.log(res);
+      console.log("Summary data:", res);
     }
     
     const getAudits = async () => {
       const res = await get('/administration/audit-schedules/')
-      setCurrentCount(res.count)
       setAudits(res)
-      console.log(res);
+      setAuditsCount(res.count)
+      console.log("Audits data:", res);
+    }
+
+    const getCompletedAudits = async () => {
+      const res = await get('/administration/audit-schedules/?status=completed')
+      setCompletedAuditsCount(res.count)
+      console.log("Completed audits:", res);
+      return res;
     }
 
     const getAuditsInProgress = async () => {
       const res = await get('/administration/audit-schedules/?status=in_progress')
       setAuditsInProgress(res)
-      console.log(res);
+      console.log("Audits in progress:", res);
     }
 
     const getStaffs = async () => {
         const res = await get('/administration/manage-users/?staff_only=true')
         setStaffs(res.data)
-        console.log(res);
+        console.log("Staffs data:", res);
     }
 
+    // Fetch data based on selected tab
+    const fetchTabData = async () => {
+      setIsLoading(true);
+      
+      switch(selectedTab) {
+        case "Pending Audits":
+          await getAllApplications();
+          break;
+        case "Scheduled Audits":
+          await getAudits();
+          break;
+        case "Completed Audits":
+          await getCompletedAudits();
+          break;
+        default:
+          break;
+      }
+      
+      setIsLoading(false);
+    }
+
+    // Initial data loading
     useEffect(() => {
-      const fetchData = async () => {
+      const fetchInitialData = async () => {
         setIsLoading(true);
-        await Promise.all([getSummary(), getAllApplications(), getAudits(), getStaffs(), getAuditsInProgress()]);
+        await Promise.all([getSummary(), getAllApplications(), getAudits(), getStaffs(), getAuditsInProgress(), getCompletedAudits()]);
         setIsLoading(false);
       };
       
-      fetchData();
-    }, [currentCount]);
+      fetchInitialData();
+    }, []);
+    
+    // Handle tab changes
+    useEffect(() => {
+      fetchTabData();
+    }, [selectedTab]);
+    
+    // When an audit is scheduled, refresh the relevant data
+    const handleAuditScheduled = async () => {
+      await Promise.all([getSummary(), getAudits(), getAuditsInProgress()]);
+      if (selectedTab === "Pending Audits") {
+        await getAllApplications();
+      } else if (selectedTab === "Scheduled Audits") {
+        await getAudits();
+      }
+    }
   
   return (
     <div>
@@ -169,7 +228,7 @@ const AuditManagement = () => {
                   </div>
                 </div>
                 {
-                    audits?.count === 0 &&
+                    auditsInProgress?.count === 0 &&
                     <div className="flex items-center justify-center mt-[3rem]">
                         <p>No audits in progress</p>
                     </div>
@@ -204,7 +263,7 @@ const AuditManagement = () => {
             <div className="flex items-center gap-3 mt-12 mb-3">
                 {
                     tabs.map(tab => (
-                        <p onClick={() => setSelectedTab(tab)} className={selectedTab === tab ? 'text-primary-color cursor-pointer bg-secondary-color rounded font-[500] px-3 py-2' : 'text-[#98A2B3] cursor-pointer px-3 py-2'}>{tab}</p>
+                        <p key={tab} onClick={() => setSelectedTab(tab)} className={selectedTab === tab ? 'text-primary-color cursor-pointer bg-secondary-color rounded font-[500] px-3 py-2' : 'text-[#98A2B3] cursor-pointer px-3 py-2'}>{tab}</p>
                     ))
                 }
             </div>
@@ -213,98 +272,119 @@ const AuditManagement = () => {
                 <div className="flex items-center justify-between px-7 pt-6">
                     <div className="flex items-center gap-2">
                         <p className="text-[#333333]">Applications</p>
-                        <p className="text-primary-color bg-secondary-color text-[14px] px-2 py-1 rounded-full cursor-pointer">{currentCount}</p>
+                        <p className="text-primary-color bg-secondary-color text-[14px] px-2 py-1 rounded-full cursor-pointer">{getCurrentCount()}</p>
                     </div>
                     <div className='text-[#19201D] items-center gap-3 border py-[6px] px-[8px] rounded-[4px] cursor-pointer hidden lg:flex'>
                         <BiSearch fontSize={"20px"}/>
                         <input type="text" placeholder='Search' className='outline-none' />
                     </div>
                 </div>
-                {
-                    audits?.length === 0 &&
-                    <div className="flex items-center justify-center mt-[5rem]">
-                        <p>No Audits Yet</p>
-                    </div>
-                }
-                {
-                  selectedTab === "Pending Audits" &&
-                    <div class="relative overflow-x-auto mt-8">
-                      <table class="w-full text-sm text-left rtl:text-left">
-                          <thead class="text-[12px] md:text-[14px] bg-[#F9FAFB] text-[#475467]">
-                              <tr>
-                                  <th scope="col" class="px-6 py-3 font-[600] flex gap-1 items-center">Application ID</th>
-                                  <th scope="col" class="px-6 py-3 font-[600]">Company</th>
-                                  <th scope="col" class="px-6 py-3 font-[600]">Country</th>
-                                  <th scope="col" class="px-6 py-3 font-[600]">Product Name</th>
-                                  <th scope="col" class="px-6 py-3 font-[600]">Status</th>
-                                  <th scope="col" class="px-6 py-3 font-[600]">AI Score</th>
-                                  <th scope="col" class="px-6 py-3 font-[600]">Date Transferred</th>
-                                  <th scope="col" class="px-6 py-3 font-[600]"></th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                              {
-                                  applications?.data?.map((application, index) => (
-                                      <tr className="border-b" key={index}>
-                                          <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] flex gap-1 items-center">{application.application_number}</td>
-                                          <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application.user.company_data?.company_name ? application.user.company_data?.company_name : "N/A"}</td>
-                                          <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application.user.company_data?.reg_country ? application.user.company_data?.company_name : "N/A"}</td>
-                                          <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application.product_name}</td>
-                                          <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] capitalize">{application?.status}</td>
-                                          <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">A1</td>
-                                          <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">Nill</td>
-                                          <td class="px-6 py-4 text-[16px] md:text-[16px] text-[#475467] flex items-center gap-4">
-                                            <BiCalendar className="cursor-pointer"/>
-                                            <BsEye className="cursor-pointer"/>
-                                          </td>
-                                          {/* <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{ new Date(audit.scheduled_date).toLocaleDateString() }</td> */}
-                                      </tr>
-                                  ))
-                              }
-                          </tbody>
-                      </table>
-                  </div>
-                }
+                
+                {selectedTab === "Pending Audits" && (
+                  <>
+                    {applications?.data?.length === 0 ? (
+                      <div className="flex items-center justify-center mt-[5rem] mb-5">
+                        <p>No Pending Audits</p>
+                      </div>
+                    ) : (
+                      <div className="relative overflow-x-auto mt-8">
+                        <table className="w-full text-sm text-left rtl:text-left">
+                            <thead className="text-[12px] md:text-[14px] bg-[#F9FAFB] text-[#475467]">
+                                <tr>
+                                    <th scope="col" className="px-6 py-3 font-[600] flex gap-1 items-center">Application ID</th>
+                                    <th scope="col" className="px-6 py-3 font-[600]">Company</th>
+                                    <th scope="col" className="px-6 py-3 font-[600]">Country</th>
+                                    <th scope="col" className="px-6 py-3 font-[600]">Product Name</th>
+                                    <th scope="col" className="px-6 py-3 font-[600]">Status</th>
+                                    <th scope="col" className="px-6 py-3 font-[600]">AI Score</th>
+                                    <th scope="col" className="px-6 py-3 font-[600]">Date Transferred</th>
+                                    <th scope="col" className="px-6 py-3 font-[600]"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    applications?.data?.map((application, index) => (
+                                        <tr className="border-b" key={index}>
+                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] flex gap-1 items-center">{application.application_number}</td>
+                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application.user.company_data?.company_name ? application.user.company_data?.company_name : "N/A"}</td>
+                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application.user.company_data?.reg_country ? application.user.company_data?.reg_country : "N/A"}</td>
+                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{application.product_name}</td>
+                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] capitalize">{application?.status}</td>
+                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">A1</td>
+                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">Nill</td>
+                                            <td className="px-6 py-4 text-[16px] md:text-[16px] text-[#475467] flex items-center gap-4">
+                                              <BiCalendar className="cursor-pointer"/>
+                                              <BsEye className="cursor-pointer"/>
+                                            </td>
+                                        </tr>
+                                    ))
+                                }
+                            </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </>
+                )}
 
-                {
-                  selectedTab === "Scheduled Audits" &&
-                    <div class="relative overflow-x-auto mt-8">
-                      <table class="w-full text-sm text-left rtl:text-left">
-                          <thead class="text-[12px] md:text-[14px] bg-[#F9FAFB] text-[#475467]">
-                              <tr>
-                                  <th scope="col" class="px-6 py-3 font-[600] flex gap-1 items-center">Application ID</th>
-                                  <th scope="col" class="px-6 py-3 font-[600]">Company</th>
-                                  <th scope="col" class="px-6 py-3 font-[600]">Country</th>
-                                  <th scope="col" class="px-6 py-3 font-[600]">Product Name</th>
-                                  <th scope="col" class="px-6 py-3 font-[600]">Status</th>
-                                  <th scope="col" class="px-6 py-3 font-[600]">AI Score</th>
-                                  <th scope="col" class="px-6 py-3 font-[600]">Date</th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                              {
-                                  audits?.data?.map((audit, index) => (
-                                      <tr className="border-b" key={index}>
-                                          <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] flex gap-1 items-center">{audit.application.application_number}</td>
-                                          <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{audit.application.user.company_data?.company_name ? audit.application.user.company_data?.company_name : "N/A"}</td>
-                                          <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{audit.application.user.company_data?.reg_country ? audit.application.user.company_data?.company_name : "N/A"}</td>
-                                          <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{audit.application.product_name}</td>
-                                          <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{audit.status}</td>
-                                          <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">A1</td>
-                                          <td class="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{ new Date(audit.scheduled_date).toLocaleDateString() }</td>
-                                      </tr>
-                                  ))
-                              }
-                          </tbody>
-                      </table>
+                {selectedTab === "Scheduled Audits" && (
+                  <>
+                    {audits?.data?.length === 0 ? (
+                      <div className="flex items-center justify-center mt-[5rem] mb-5">
+                        <p>No Scheduled Audits</p>
+                      </div>
+                    ) : (
+                      <div className="relative overflow-x-auto mt-8">
+                        <table className="w-full text-sm text-left rtl:text-left">
+                            <thead className="text-[12px] md:text-[14px] bg-[#F9FAFB] text-[#475467]">
+                                <tr>
+                                    <th scope="col" className="px-6 py-3 font-[600] flex gap-1 items-center">Application ID</th>
+                                    <th scope="col" className="px-6 py-3 font-[600]">Company</th>
+                                    <th scope="col" className="px-6 py-3 font-[600]">Country</th>
+                                    <th scope="col" className="px-6 py-3 font-[600]">Product Name</th>
+                                    <th scope="col" className="px-6 py-3 font-[600]">Status</th>
+                                    <th scope="col" className="px-6 py-3 font-[600]">AI Score</th>
+                                    <th scope="col" className="px-6 py-3 font-[600]">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    audits?.data?.map((audit, index) => (
+                                        <tr className="border-b" key={index}>
+                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] flex gap-1 items-center">{audit.application.application_number}</td>
+                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{audit.application.user.company_data?.company_name ? audit.application.user.company_data?.company_name : "N/A"}</td>
+                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{audit.application.user.company_data?.reg_country ? audit.application.user.company_data?.reg_country : "N/A"}</td>
+                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{audit.application.product_name}</td>
+                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467] capitalize">{audit.status}</td>
+                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">A1</td>
+                                            <td className="px-6 py-4 text-[12px] md:text-[16px] text-[#475467]">{ new Date(audit.scheduled_date).toLocaleDateString() }</td>
+                                        </tr>
+                                    ))
+                                }
+                            </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {selectedTab === "Completed Audits" && (
+                  <div className="flex items-center justify-center mt-[5rem] mb-5">
+                    <p>Completed Audits Table Would Go Here</p>
                   </div>
-                }
+                )}
             </div>
           </div>
         </div>
       </>
       {
-        scheduleAnAudit && <ScheduleAnAudit staffs={staffs} applications={applications} setScheduleAnAudit={setScheduleAnAudit} getAudits={getAudits}/>
+        scheduleAnAudit && (
+          <ScheduleAnAudit 
+            staffs={staffs} 
+            applications={applications} 
+            setScheduleAnAudit={setScheduleAnAudit} 
+            getAudits={() => handleAuditScheduled()}
+          />
+        )
       }
     </div>
   );
