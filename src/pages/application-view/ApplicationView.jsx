@@ -56,6 +56,22 @@ const ApplicationView = () => {
         }
     }
 
+    const revokeDocument = async () => {
+        try {
+            setLoading(true)
+            const res = await post('/administration/application-review/', {comment, application:id, review_type:'document_verification',approved: false})
+            setMsg(res.message)
+            setAlertType('success')
+        } catch (error) {
+            console.log(error);
+            
+            setMsg(error?.response?.data?.message)
+            setAlertType('error')
+        } finally {
+            setLoading(false);
+        }
+    }
+
     useEffect(() => {
         getApplicationInfo()
     },[])
@@ -459,8 +475,8 @@ const ApplicationView = () => {
                     selectedTab === "Reviewer Section" &&
                     <div className="mt-[3.5rem] flex flex-col gap-[2rem] justify-between">
                         <div className="w-full">
-                            <div className="flex items-center justify-between px-[20px]">
-                                <p className="font-[600] text-primary-color text-[22px] border-b border-[#F2F2F2] pb-3">Reviewer Section</p>
+                            <div className="flex items-center justify-between px-[20px] border-b border-[#F2F2F2] pb-3">
+                                <p className="font-[600] text-primary-color text-[22px]">Reviewer Section</p>
                                 <p className="text-primary-color text-[14px]">Date Completed: -</p>
                             </div>
                             <div className="px-[20px] mt-5 grid gap-4">
@@ -496,10 +512,9 @@ const ApplicationView = () => {
                                 </div>
                                 :
                                 <div className="mt-12 flex items-center gap-4 justify-end mr-[22px]">
-                                    <button className="border-[#FDA29B] border text-[#B42318] py-2 px-4 rounded-[4px]">Disapprove</button>
+                                    <button onClick={revokeDocument} className="border-[#FDA29B] border text-[#B42318] py-2 px-4 rounded-[4px]">Disapprove</button>
                                     <button onClick={approveDocument} className="bg-primary-color py-2 px-4 rounded-[4px] text-white">Approve and Proceed to Next Stage</button>
                                 </div>
-
                             }
                         </div>
                     </div>

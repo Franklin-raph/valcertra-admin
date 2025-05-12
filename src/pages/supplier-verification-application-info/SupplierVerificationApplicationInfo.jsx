@@ -1,18 +1,27 @@
 import React, { useState, useEffect } from "react";
 import TopNav from "../../components/top-nav/TopNav";
 import SideNav from "../../components/side-nav/SideNav";
-import { get } from "../../utils/axiosHelpers";
+import { get, post } from "../../utils/axiosHelpers";
 import { useParams } from "react-router-dom";
+import Alert from "../../components/alert/Alert";
+import BtnLoader from "../../components/btnLoader/BtnLoader";
 // import FullPageLoader from "../../components/full-page-loader/FullPageLoader";
 
 
-const AuditApplicationView = () => {
+const SupplierVerificationApplicationInfo = () => {
 
     const [toggleNav, setToggleNav] = useState(false)
     const [applicationInfo, setApplicationInfo] = useState()
     const [isLoading, setIsLoading] = useState(true)
-    const tabs = ["Application Details", "Uploaded Documents", "Reviewer Section", "Supplier Verification", "Audit Mangement", "Final Approval and Certification"]
+    const [cva, setCva] = useState('')
+    const [description, setDescription] = useState('')
+    const tabs = ["Application Details", "Uploaded Documents", "Supplier Verification"]
     const [selectedTab, setSelectedTab] = useState(tabs[0])
+    const [loading, setLoading] = useState(false)
+    const [msg, setMsg] = useState('')
+    const [alertType, setAlertType] = useState('')
+    const [calculated_value_addition, setCalculatedValueAddition] = useState('')
+    const [comment, setComment] = useState('')
     const { id } = useParams()
 
     const getApplicationInfo = async () => {
@@ -20,11 +29,43 @@ const AuditApplicationView = () => {
             setIsLoading(true)
             const res = await get(`/application/${id}/retrieve_application/`)
             setApplicationInfo(res.data)
-            console.log(res);
+            console.log(res.data);
         } catch (error) {
             console.error("Error fetching applications:", error);
         }finally{
             setIsLoading(false)
+        }
+    }
+
+    const approveDocument = async () => {
+        try {
+            setLoading(true)
+            const res = await post('/administration/application-review/', {comment, application:id, review_type:'document_verification',approved: true})
+            setMsg(res.message)
+            setAlertType('success')
+        } catch (error) {
+            console.log(error);
+            
+            setMsg(error?.response?.data?.message)
+            setAlertType('error')
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const revokeDocument = async () => {
+        try {
+            setLoading(true)
+            const res = await post('/administration/application-review/', {comment, application:id, review_type:'document_verification',approved: false})
+            setMsg(res.message)
+            setAlertType('success')
+        } catch (error) {
+            console.log(error);
+            
+            setMsg(error?.response?.data?.message)
+            setAlertType('error')
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -38,18 +79,19 @@ const AuditApplicationView = () => {
       <>
         <SideNav toggleNav={toggleNav} setToggleNav={setToggleNav}/>
         <div className="w-full lg:w-[82%] ml-auto">
+        {msg && <Alert alertType={alertType} msg={msg} setMsg={setMsg} />}
           <TopNav setToggleNav={setToggleNav} toggleNav={toggleNav} />
           <div className="px-[10px] md:px-[30px] pb-[1rem] mt-[100px]">
             <div className="flex items-center gap-4">
                 {
-                    applicationInfo?.document_verification === 'pending' ?
+                    applicationInfo?.status === 'pending' ?
                     (
                     <div className="flex items-center gap-2 bg-[#FFFAEB] rounded-full py-[6px] px-[10px]">
                         <img src="./clock.svg" alt="" className="w-[16px]" />
                         <p className="text-[14px] text-[#B54708] font-[500]">Pending</p>
                     </div>
                     ) :
-                    applicationInfo?.document_verification === 'application_verification' ?
+                    applicationInfo?.status === 'under_review' ?
                     (
                     <div className="flex items-center gap-2 bg-[#FFFAEB] rounded-full py-[6px] px-[10px]">
                         <img src="./clock.svg" alt="" className="w-[16px]" />
@@ -57,7 +99,7 @@ const AuditApplicationView = () => {
                     </div>
                     )
                     :
-                    applicationInfo?.document_verification === 'rejected' ?
+                    applicationInfo?.status === 'rejected' ?
                     (
                     <div className="flex items-center gap-2 bg-[#FEF3F2] rounded-full py-[6px] px-[10px]">
                         <img src="./x-circle.svg" alt="" className="w-[16px]" />
@@ -74,9 +116,12 @@ const AuditApplicationView = () => {
             </div>
 
             <div className="mt-7 border border-[#F2F4F7] py-4 px-3 rounded-[4px]">
-                <div>
-                    <p className="text-[#666666]">Application Number: {applicationInfo?.application_number}</p>
-                    <p className="text-text-color font-[600] text-[30px] mt-[6px]">View Certification Application</p>
+                <div className="flex items-end justify-between">
+                    <div>
+                        <p className="text-[#666666]">Application Number: {applicationInfo?.application_number}</p>
+                        <p className="text-text-color font-[600] text-[30px] mt-[6px]">View Certification Application</p>
+                    </div>
+                    <p className="text-[#027A48] bg-[#ECFDF3] py-1 px-2 rounded-full text-[14px]">AI Risk: Low</p>
                 </div>
                 <div className="flex items-center gap-3 mt-[40px] text-[13px]">
                     {
@@ -98,7 +143,7 @@ const AuditApplicationView = () => {
                                 </div>
                                 <div>
                                     <p className="text-text-color font-[500] text-[16px]">Product Category</p>
-                                    <p className="text-[#666666] mt-[2px]">{applicationInfo?.product_category.product_category}</p>
+                                    <p className="text-[#666666] mt-[2px]">{applicationInfo?.product_category?.product_category}</p>
                                 </div>
                                 <div>
                                     <p className="text-text-color font-[500] text-[16px]">Date Applied</p>
@@ -332,7 +377,6 @@ const AuditApplicationView = () => {
 
                 {
                     selectedTab === "Uploaded Documents" &&
-
                     <div className="mt-[3.5rem] flex flex-col gap-[2rem] justify-between">
                         <div className="w-full">
                             <p className="font-[600] text-primary-color text-[22px] border-b border-[#F2F2F2] pb-3 pl-[20px]">Product Documents</p>
@@ -413,7 +457,6 @@ const AuditApplicationView = () => {
                                                 <img src="./file-text.svg" alt="" />
                                                 <div>
                                                     <p className="text-[#344054]">Supplier Invoice ({index+1})</p>
-                                                    {/* <p className="text-[#475467] mt-[4px]">200 KB</p> */}
                                                 </div>
                                             </div>
                                             <img src="./eye.svg" alt="" />
@@ -421,6 +464,56 @@ const AuditApplicationView = () => {
                                     ))
                                 }
                             </div>
+                        </div>
+                    </div>
+                }
+
+                {
+                    selectedTab === "Supplier Verification" &&
+                    <div className="mt-[3.5rem] flex flex-col gap-[2rem] justify-between">
+                        <div className="w-full">
+                            <div className="flex items-center justify-between px-[20px] border-b border-[#F2F2F2] pb-3">
+                                <p className="font-[600] text-primary-color text-[22px]">Supplier Verification Section</p>
+                                <p className="text-primary-color text-[14px]">Date Completed: -</p>
+                            </div>
+                            <div className="px-[20px] mt-5 grid gap-4">
+                                {/* <div className='w-full text-left mt-2'>
+                                    <label className='block mb-1 text-[15px] text-[#344054]'>Value Addition</label>
+                                    <div className='border border-[#D0D5DD] bg-white py-2 px-2 w-full rounded-[4px] text-[#667085] flex items-center gap-3'>
+                                        <input
+                                            value={calculated_value_addition}
+                                            onChange={e => setCalculatedValueAddition(e.target.value)}
+                                            type="text"
+                                            placeholder='Enter Value Addition'
+                                            className='w-full outline-none bg-transparent'
+                                        />
+                                    </div>
+                                </div> */}
+                                <div className='w-full text-left'>
+                                    <label className='block mb-1 text-[15px] text-[#344054]'>Any Comments</label>
+                                    <div className='border border-[#D0D5DD] bg-white py-2 px-2 w-full rounded-[4px] text-[#667085] flex items-center gap-3'>
+                                        <textarea
+                                            value={comment}
+                                            onChange={e => setComment(e.target.value)} 
+                                            type="text" 
+                                            placeholder='Enter a description...' 
+                                            className='w-full outline-none bg-transparent resize-none h-[100px]'
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            {
+                                loading ?
+                                <div className="mt-12 flex items-center gap-4 justify-end mr-[22px]">
+                                    <BtnLoader />
+                                </div>
+                                :
+                                <div className="mt-12 flex items-center gap-4 justify-end mr-[22px]">
+                                    <button onClick={revokeDocument} className="border-[#FDA29B] border text-[#B42318] py-2 px-4 rounded-[4px]">Disapprove</button>
+                                    <button onClick={approveDocument} className="bg-primary-color py-2 px-4 rounded-[4px] text-white">Approve and Proceed to Next Stage</button>
+                                </div>
+
+                            }
                         </div>
                     </div>
                 }
@@ -432,4 +525,4 @@ const AuditApplicationView = () => {
   );
 }
 
-export default AuditApplicationView;
+export default SupplierVerificationApplicationInfo;

@@ -202,7 +202,7 @@ const SupplierVerification = () => {
                                       }
                                     </td>
                                     <td class="px-6 py-4 text-[12px] text-[#475467]">{ new Date(application.created_at).toLocaleDateString() }</td>
-                                    <td class="px-6 py-4 text-[12px] text-[#475467] cursor-pointer"> <BsEye /> </td>
+                                    <td class="px-6 py-4 text-[12px] text-[#475467]"> <BsEye className="cursor-pointer" onClick={() => navigate(`/supplier-verification/${application.id}`)}/> </td>
                                 </tr>
                             ))
                         }
