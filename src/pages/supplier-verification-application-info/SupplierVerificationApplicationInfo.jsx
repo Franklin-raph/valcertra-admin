@@ -15,7 +15,7 @@ const SupplierVerificationApplicationInfo = () => {
     const [isLoading, setIsLoading] = useState(true)
     const [cva, setCva] = useState('')
     const [description, setDescription] = useState('')
-    const tabs = ["Application Details", "Uploaded Documents", "Supplier Verification"]
+    const tabs = ["Application Details", "Uploaded Documents", "Reviewer Section", "Supplier Verification"]
     const [selectedTab, setSelectedTab] = useState(tabs[0])
     const [loading, setLoading] = useState(false)
     const [msg, setMsg] = useState('')

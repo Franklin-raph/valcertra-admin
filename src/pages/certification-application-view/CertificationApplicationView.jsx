@@ -8,14 +8,14 @@ import BtnLoader from "../../components/btnLoader/BtnLoader";
 // import FullPageLoader from "../../components/full-page-loader/FullPageLoader";
 
 
-const AuditManagementApplicationInfo = () => {
+const CertificationApplicationView = () => {
 
     const [toggleNav, setToggleNav] = useState(false)
     const [applicationInfo, setApplicationInfo] = useState()
     const [isLoading, setIsLoading] = useState(true)
     const [cva, setCva] = useState('')
     const [description, setDescription] = useState('')
-    const tabs = ["Application Details", "Uploaded Documents", "Reviewer Section", "Supplier Verification", "Audit Managemennt"]
+    const tabs = ["Application Details", "Uploaded Documents", "Reviewer Section", "Supplier Verification", "Audit Managemennt", "Final Approval and Certification"]
     const [selectedTab, setSelectedTab] = useState(tabs[0])
     const [loading, setLoading] = useState(false)
     const [msg, setMsg] = useState('')
@@ -40,7 +40,7 @@ const AuditManagementApplicationInfo = () => {
     const approveDocument = async () => {
         try {
             setLoading(true)
-            const res = await post('/administration/application-review/', {comment, application:id, review_type:'audit',approved: true})
+            const res = await post('/administration/application-review/', {comment, application:id, review_type:'certification',approved: true})
             setMsg(res.message)
             setAlertType('success')
         } catch (error) {
@@ -56,7 +56,7 @@ const AuditManagementApplicationInfo = () => {
     const revokeDocument = async () => {
         try {
             setLoading(true)
-            const res = await post('/administration/application-review/', {comment, application:id, review_type:'audit',approved: false})
+            const res = await post('/administration/application-review/', {comment, application:id, review_type:'certification',approved: false})
             setMsg(res.message)
             setAlertType('success')
         } catch (error) {
@@ -469,11 +469,11 @@ const AuditManagementApplicationInfo = () => {
                 }
 
                 {
-                    selectedTab === "Audit Managemennt" &&
+                    selectedTab === "Final Approval and Certification" &&
                     <div className="mt-[3.5rem] flex flex-col gap-[2rem] justify-between">
                         <div className="w-full">
                             <div className="flex items-center justify-between px-[20px] border-b border-[#F2F2F2] pb-3">
-                                <p className="font-[600] text-primary-color text-[22px]">Audit Managemennt</p>
+                                <p className="font-[600] text-primary-color text-[22px]">Final Approval and Certification</p>
                                 <p className="text-primary-color text-[14px]">Date Completed: -</p>
                             </div>
                             <div className="px-[20px] mt-5 grid gap-4">
@@ -509,8 +509,8 @@ const AuditManagementApplicationInfo = () => {
                                 </div>
                                 :
                                 <div className="mt-12 flex items-center gap-4 justify-end mr-[22px]">
-                                    <button onClick={revokeDocument} className="border-[#FDA29B] border text-[#B42318] py-2 px-4 rounded-[4px]">Disapprove</button>
-                                    <button onClick={approveDocument} className="bg-primary-color py-2 px-4 rounded-[4px] text-white">Approve and Proceed to Next Stage</button>
+                                    <button onClick={revokeDocument} className="border-[#FDA29B] border text-[#B42318] py-2 px-4 rounded-[4px]">Reject Application</button>
+                                    <button onClick={approveDocument} className="bg-primary-color py-2 px-4 rounded-[4px] text-white">Approve Application</button>
                                 </div>
 
                             }
@@ -525,4 +525,4 @@ const AuditManagementApplicationInfo = () => {
   );
 }
 
-export default AuditManagementApplicationInfo;
+export default CertificationApplicationView;

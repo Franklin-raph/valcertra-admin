@@ -157,7 +157,7 @@ const Certifications = () => {
                                       }
                                     </td>
                                     <td class="px-6 py-4 text-[12px] text-[#475467]">{ new Date(application?.created_at).toLocaleDateString() }</td>
-                                    <td class="px-6 py-4 text-[12px] text-[#475467] cursor-pointer"> <BsEye onClick={() => navigate(`/applications/${application.id}`)}/> </td>
+                                    <td class="px-6 py-4 text-[12px] text-[#475467] cursor-pointer"> <BsEye onClick={() => navigate(`/certifications/application/${application.id}`)}/> </td>
                                 </tr>
                             ))
                         }

@@ -33,6 +33,7 @@ export default function AddAStaff({ staffs, setAddStaff, getStaffs }) {
     first_name: '',
     last_name: '',
     email:'',
+    password:'',
   });
 
   const [loading, setLoading] = useState(false)
@@ -63,6 +64,7 @@ export default function AddAStaff({ staffs, setAddStaff, getStaffs }) {
             formData.first_name = ""
             formData.last_name = ""
             formData.email = ""
+            formData.password = ""
             selectdRole = {}
         } catch (error) {
             setMsg(error.message)
@@ -118,6 +120,17 @@ export default function AddAStaff({ staffs, setAddStaff, getStaffs }) {
                         onChange={(e) => handleInputChange('email', e.target.value)}
                         className="w-full p-2 border border-gray-300 rounded outline-none"
                         placeholder="amarachigrace@gmail.com"
+                    />
+                </div>
+
+                <div className="mb-3">
+                    <label className="block text-sm font-medium text-[#344054] mb-1 text-left">Password</label>
+                    <input
+                        type="password"
+                        value={formData.password}
+                        onChange={(e) => handleInputChange('password', e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded outline-none"
+                        placeholder="****"
                     />
                 </div>
 
