@@ -264,7 +264,7 @@ const AuditManagementApplicationInfo = () => {
                                     </div>
                                     <div>
                                         <p className="text-text-color font-[500] text-[16px]">Calculated value addition (%)</p>
-                                        <p className="text-[#666666] mt-[2px]">{applicationInfo?.calculated_value_addition}</p>
+                                        <p className="text-[#666666] mt-[2px]">{applicationInfo?.cva}</p>
                                     </div>
                                 </div>
                             </div>
@@ -333,7 +333,7 @@ const AuditManagementApplicationInfo = () => {
                                 <div className="pl-[20px] mt-5 grid gap-7 text-[14px] w-full">
                                     <div>
                                         <p className="text-text-color font-[500] text-[16px]">Do you run or fund community development project</p>
-                                        <p className="text-[#666666] mt-[2px]">{applicationInfo?.do_you_run_or_fund_community_development_project}</p>
+                                        <p className="text-[#666666] mt-[2px]">{applicationInfo?.do_you_run_or_fund_community_development_project.toString()}</p>
                                     </div>
                                     <div>
                                         <p className="text-text-color font-[500] text-[16px]">Project description</p>
@@ -347,7 +347,7 @@ const AuditManagementApplicationInfo = () => {
                                 <div className="pl-[20px] mt-5 grid gap-7 text-[14px] w-full">
                                     <div>
                                         <p className="text-text-color font-[500] text-[16px]">Grievance mechanism description</p>
-                                        <p className="text-[#666666] mt-[2px]">{applicationInfo?.grievance_mechanism_description}</p>
+                                        <p className="text-[#666666] mt-[2px]">{applicationInfo?.grievance_mechanism_description.toString()}</p>
                                     </div>
                                     <div>
                                         <p className="text-text-color font-[500] text-[16px]">Grievance description</p>
