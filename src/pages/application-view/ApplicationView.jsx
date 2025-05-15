@@ -59,7 +59,7 @@ const ApplicationView = () => {
     const revokeDocument = async () => {
         try {
             setLoading(true)
-            const res = await post('/administration/application-review/', {comment, application:id, review_type:'document_verification',approved: false})
+            const res = await post('/administration/application-review/', {comment, application:id, review_type:'application_verification',approved: false})
             setMsg(res.message)
             setAlertType('success')
         } catch (error) {

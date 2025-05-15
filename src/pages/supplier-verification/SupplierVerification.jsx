@@ -1,25 +1,22 @@
 import React, { useState, useEffect } from "react";
 import TopNav from "../../components/top-nav/TopNav";
 import SideNav from "../../components/side-nav/SideNav";
-// import ValueAdditionCalculator from "../../components/value-addition-calculator/ValueAdditionCalculator";
-// import CertificateApplication from "../../components/certificate-application/CertificateApplication";
 import { get } from "../../utils/axiosHelpers";
-// import FullPageLoader from "../../components/full-page-loader/FullPageLoader";
 import { useNavigate } from "react-router-dom";
-import { BsArrow90DegUp, BsEye } from "react-icons/bs";
+import { BsEye } from "react-icons/bs";
 import { FiArrowDownRight, FiArrowUpRight } from "react-icons/fi";
 import Cookies from 'js-cookie';
 import { BiCalendar, BiMap, BiSearch } from "react-icons/bi";
-import { RiMap2Fill } from "react-icons/ri";
 
 
 const SupplierVerification = () => {
 
     const [toggleNav, setToggleNav] = useState(false)
     const [applications, setApplications] = useState()
+    const [filteredApplications, setFilteredApplications] = useState([])
     const [summary, setSummary] = useState()
     const [scheduledAudits, setScheduledAudits] = useState()
-    const [searchText, setSeacrhText] = useState('')
+    const [searchText, setSearchText] = useState('')
     const [isLoading, setIsLoading] = useState(true)
     const navigate = useNavigate()
     const token = Cookies.get('token')
@@ -44,6 +41,32 @@ const SupplierVerification = () => {
       console.log(res);
     }
 
+    // Filter applications based on selected tab
+    const filterApplicationsByTab = (data, tab) => {
+      if (!data || !data.data) return [];
+      
+      switch(tab) {
+        case "All":
+          return data.data;
+        case "Pending Verification":
+          return data.data.filter(app => 
+            app?.reviewer_data?.document_verification?.status === 'pending'
+          );
+        case "Approved Verification":
+          return data.data.filter(app => 
+            app?.reviewer_data?.document_verification?.status === 'completed' && 
+            app?.reviewer_data?.document_verification?.approved === true
+          );
+        case "Disapproved Verification":
+          return data.data.filter(app => 
+            app?.reviewer_data?.document_verification?.status === 'completed' && 
+            app?.reviewer_data?.document_verification?.approved === false
+          );
+        default:
+          return data.data;
+      }
+    }
+
     useEffect(() => {
       const fetchData = async () => {
         setIsLoading(true);
@@ -53,6 +76,31 @@ const SupplierVerification = () => {
       
       fetchData();
     }, []);
+
+    // Update filtered applications when tab changes or applications data changes
+    useEffect(() => {
+      if (applications) {
+        const filtered = filterApplicationsByTab(applications, selectedTab);
+        setFilteredApplications(filtered);
+      }
+    }, [selectedTab, applications]);
+
+    // Handle tab selection
+    const handleTabChange = (tab) => {
+      setSelectedTab(tab);
+    }
+
+    // Filter applications by search text
+    const getSearchFilteredApplications = () => {
+      if (!filteredApplications) return [];
+      if (!searchText) return filteredApplications;
+      
+      return filteredApplications.filter(application => 
+        (application.application_number || "").toLowerCase().includes(searchText.toLowerCase()) || 
+        (application?.user?.company_data?.company_name || "").toLowerCase().includes(searchText.toLowerCase()) || 
+        (application?.product_name || "").toLowerCase().includes(searchText.toLowerCase())
+      );
+    }
   
   return (
     <div>
@@ -144,7 +192,13 @@ const SupplierVerification = () => {
             <div className="flex items-center gap-3 mt-12 mb-3">
                 {
                     tabs.map(tab => (
-                        <p onClick={() => setSelectedTab(tab)} className={selectedTab === tab ? 'text-primary-color cursor-pointer bg-secondary-color rounded font-[500] px-3 py-2' : 'text-[#98A2B3] cursor-pointer px-3 py-2'}>{tab}</p>
+                        <p 
+                          key={tab}
+                          onClick={() => handleTabChange(tab)} 
+                          className={selectedTab === tab ? 'text-primary-color cursor-pointer bg-secondary-color rounded font-[500] px-3 py-2' : 'text-[#98A2B3] cursor-pointer px-3 py-2'}
+                        >
+                          {tab}
+                        </p>
                     ))
                 }
             </div>
@@ -153,122 +207,76 @@ const SupplierVerification = () => {
                 <div className="flex items-center justify-between px-7 pt-6">
                     <div className="flex items-center gap-2">
                         <p className="text-[#333333]">Applications</p>
-                        <p className="text-primary-color bg-secondary-color text-[14px] px-2 py-1 rounded-full cursor-pointer">{applications?.count}</p>
+                        <p className="text-primary-color bg-secondary-color text-[14px] px-2 py-1 rounded-full cursor-pointer">
+                          {filteredApplications?.length || 0}
+                        </p>
                     </div>
                     <div className='text-[#19201D] items-center gap-3 border py-[6px] px-[8px] rounded-[4px] cursor-pointer hidden lg:flex'>
                         <BiSearch fontSize={"20px"}/>
-                        <input type="text" placeholder='Search' onChange={e => setSeacrhText(e.target.value)} className='outline-none' />
+                        <input 
+                          type="text" 
+                          placeholder='Search' 
+                          onChange={e => setSearchText(e.target.value)} 
+                          className='outline-none' 
+                        />
                     </div>
                 </div>
                 {
-                    applications?.length === 0 &&
-                    <div className="flex items-center justify-center mt-[5rem]">
-                        <p>No Applications Yet</p>
+                    getSearchFilteredApplications()?.length === 0 &&
+                    <div className="flex items-center justify-center mt-[5rem] mb-[5rem]">
+                        <p>No Applications Found</p>
                     </div>
                 }
-              <div class="relative overflow-x-auto mt-8">
-                <table class="w-full text-sm text-left rtl:text-left">
-                    <thead class="text-[12px] bg-[#F9FAFB] text-[#475467]">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 font-[600] flex gap-1 items-center">Application ID</th>
-                            <th scope="col" class="px-6 py-3 font-[600]">Company</th>
-                            <th scope="col" class="px-6 py-3 font-[600]">Country</th>
-                            <th scope="col" class="px-6 py-3 font-[600]">Product Name</th>
-                            <th scope="col" class="px-6 py-3 font-[600]">Status</th>
-                            <th scope="col" class="px-6 py-3 font-[600]">AI Score</th>
-                            <th scope="col" class="px-6 py-3 font-[600]">Date</th>
-                            <th scope="col" class="px-6 py-3 font-[600]"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                      {
-                            applications?.data?.filter(application => application.application_number.toLowerCase().includes(searchText.toLowerCase()) || application?.user?.company_data?.company_name.toLowerCase().includes(searchText.toLowerCase()) || application?.product_name.toLowerCase().includes(searchText.toLowerCase()))
-                            .map((application, index) => (
-                                <tr className="border-b" key={index}>
-                                    <td class="px-6 py-4 text-[12px] text-[#475467] flex gap-1 items-center">{application.application_number}</td>
-                                    <td class="px-6 py-4 text-[12px] text-[#475467]">{application?.user?.company_data?.company_name ? application?.user.company_data?.company_name : "Nill"}</td>
-                                    <td class="px-6 py-4 text-[12px] text-[#475467]">{application?.user.company_data?.reg_country ? application?.user.company_data?.reg_country : "Nill"}</td>
-                                    <td class="px-6 py-4 text-[12px] text-[#475467]">{application.product_name}</td>
-                                    <td class="px-6 py-4 text-[12px] text-[#475467] capitalize">{application.current_review_stage}</td>
-                                    <td class="px-6 py-4 text-[12px] text-[#475467]">
-                                      {
-                                        application?.ai_score === 'high'?
-                                        <span className="text-[#B42318] bg-[#FEF3F2] px-2 py-1 rounded-full">AI Risk: {application?.ai_score}</span>
-                                        :
-                                        application?.ai_score === 'medium' ?
-                                        <span className="bg-[#FFFAEB] text-[#B54708] px-2 py-1 rounded-full">AI Risk: {application?.ai_score}</span>
-                                        :
-                                        <span className="bg-[#ECFDF3] text-[#027A48] px-2 py-1 rounded-full">AI Risk: {application?.ai_score}</span>
-                                      }
-                                    </td>
-                                    <td class="px-6 py-4 text-[12px] text-[#475467]">{ new Date(application.created_at).toLocaleDateString() }</td>
-                                    <td class="px-6 py-4 text-[12px] text-[#475467]"> <BsEye className="cursor-pointer" onClick={() => navigate(`/supplier-verification/application/${application.id}`)}/> </td>
-                                </tr>
-                            ))
-                        }
-                    </tbody>
-                </table>
-            </div>
-              {/* {
-                applications?.map((application, index) => (
-                  <div onClick={() => navigate(`/applications/${application.id}`)} className="border border-[#F2F4F7] px-4 py-[10px] mt-4 rounded-[4px] cursor-pointer">
-                      <div className="flex items-center justify-between mb-4 rounded-[4px]">
-                          <p className="text-[#333333] font-[600]">{application?.product_name}</p>
-                          {
-                            application?.status === 'pending' ?
-                            (
-                              <div className="flex items-center gap-2 bg-[#FFFAEB] rounded-full py-[6px] px-[10px]">
-                                  <img src="./clock.svg" alt="" className="w-[16px]" />
-                                  <p className="text-[14px] text-[#B54708] font-[500]">Pending</p>
-                              </div>
-                            ) :
-                            application?.status === 'under_review' ?
-                            (
-                              <div className="flex items-center gap-2 bg-[#FFFAEB] rounded-full py-[6px] px-[10px]">
-                                  <img src="./clock.svg" alt="" className="w-[16px]" />
-                                  <p className="text-[14px] text-[#B54708] font-[500]">Under Review</p>
-                              </div>
-                            )
-                            :
-                            application?.status === 'rejected' ?
-                            (
-                              <div className="flex items-center gap-2 bg-[#FEF3F2] rounded-full py-[6px] px-[10px]">
-                                  <img src="./x-circle.svg" alt="" className="w-[16px]" />
-                                  <p className="text-[14px] text-[#B42318] font-[500]">Rejected</p>
-                              </div>
-                            )
-                            :
-                            <div className="flex items-center gap-2 bg-[#ECFDF3] rounded-full py-[6px] px-[10px]">
-                                <img src="./check-circle.svg" alt="" className="w-[16px]" />
-                                <p className="text-[14px] text-[#027A48] font-[500]">Certified</p>
-                            </div>
+              {getSearchFilteredApplications()?.length > 0 && (
+                <div className="relative overflow-x-auto mt-8">
+                  <table className="w-full text-sm text-left rtl:text-left">
+                      <thead className="text-[12px] bg-[#F9FAFB] text-[#475467]">
+                          <tr>
+                              <th scope="col" className="px-6 py-3 font-[600] flex gap-1 items-center">Application ID</th>
+                              <th scope="col" className="px-6 py-3 font-[600]">Company</th>
+                              <th scope="col" className="px-6 py-3 font-[600]">Country</th>
+                              <th scope="col" className="px-6 py-3 font-[600]">Product Name</th>
+                              <th scope="col" className="px-6 py-3 font-[600]">Status</th>
+                              <th scope="col" className="px-6 py-3 font-[600]">AI Score</th>
+                              <th scope="col" className="px-6 py-3 font-[600]">Date</th>
+                              <th scope="col" className="px-6 py-3 font-[600]"></th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                        {
+                              getSearchFilteredApplications().map((application, index) => (
+                                  <tr className="border-b" key={index}>
+                                      <td className="px-6 py-4 text-[12px] text-[#475467] flex gap-1 items-center">{application.application_number}</td>
+                                      <td className="px-6 py-4 text-[12px] text-[#475467]">{application?.user?.company_data?.company_name ? application?.user.company_data?.company_name : "Nill"}</td>
+                                      <td className="px-6 py-4 text-[12px] text-[#475467]">{application?.user.company_data?.reg_country ? application?.user.company_data?.reg_country : "Nill"}</td>
+                                      <td className="px-6 py-4 text-[12px] text-[#475467]">{application.product_name}</td>
+                                      <td className="px-6 py-4 text-[12px] text-[#475467] capitalize">{application.reviewer_data?.document_verification?.status}</td>
+                                      <td className="px-6 py-4 text-[12px] text-[#475467]">
+                                        {
+                                          application?.ai_score === 'high'?
+                                          <span className="text-[#B42318] bg-[#FEF3F2] px-2 py-1 rounded-full">AI Risk: {application?.ai_score}</span>
+                                          :
+                                          application?.ai_score === 'medium' ?
+                                          <span className="bg-[#FFFAEB] text-[#B54708] px-2 py-1 rounded-full">AI Risk: {application?.ai_score}</span>
+                                          :
+                                          <span className="bg-[#ECFDF3] text-[#027A48] px-2 py-1 rounded-full">AI Risk: {application?.ai_score}</span>
+                                        }
+                                      </td>
+                                      <td className="px-6 py-4 text-[12px] text-[#475467]">{ new Date(application.created_at).toLocaleDateString() }</td>
+                                      <td className="px-6 py-4 text-[12px] text-[#475467]"> 
+                                        <BsEye 
+                                          className="cursor-pointer" 
+                                          onClick={() => navigate(`/supplier-verification/application/${application.id}`)}
+                                        /> 
+                                      </td>
+                                  </tr>
+                              ))
                           }
-                      </div>
-                      <div className="flex items-center justify-between text-[15px]">
-                          <p className="text-text-color">Submitted: { new Date(application.created_at).toLocaleDateString() } </p>
-                          <p className="text-text-color">Value Addition: 46%</p>
-                      </div>
-                  </div>
-                ))
-              } */}
+                      </tbody>
+                  </table>
+                </div>
+              )}
             </div>
-
-            {/* <div>
-              <div className="bg-[#FEC84B] py-[10px] px-[10px] mt-12 rounded-t-[4px] flex items-center justify-between">
-                <p className="text-[#7A2E0E]">Upcoming Renewal</p>
-              </div>
-              <div className="bg-[#FEF0C7] px-4 py-[10px] rounded-b-[4px] pt-[1.8rem]">
-                <div className="flex items-center justify-between mb-4 rounded-[4px]">
-                  <p className="text-[#333333] font-[600]">Processed Cocoa Product</p>
-                  <p className="text-[#F79009] text-[15px]">30 days Remaining</p>
-                </div>
-                <div className="flex items-center justify-between text-[15px]">
-                  <p className="text-text-color">Expires: 2025-02-26</p>
-                  <button className="bg-primary-color text-white py-[6px] text-[14px] px-5 rounded-[4px] font-[500]"> Renew Now</button>
-                </div>
-              </div>
-            </div> */}
-
           </div>
         </div>
       </>

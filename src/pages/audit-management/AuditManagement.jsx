@@ -9,6 +9,7 @@ import Cookies from 'js-cookie';
 import { BiCalendar, BiMap, BiSearch } from "react-icons/bi";
 import { RiMap2Fill } from "react-icons/ri";
 import ScheduleAnAudit from "../../components/shedule-an-audit/ScheduleAnAudit";
+import ScheduleAnAuditByApp from "../../components/schedule-an-audit-by-app/ScheduleAnAuditByApp";
 
 const AuditManagement = () => {
 
@@ -24,6 +25,7 @@ const AuditManagement = () => {
     const tabs = ["Pending Audits", "Scheduled Audits", "Completed Audits"]
     const [selectedTab, setSelectedTab] = useState(tabs[0])
     const [scheduleAnAudit, setScheduleAnAudit] = useState(false)
+    const [scheduleAnAuditByApp, setScheduleAnAuditByApp] = useState(false)
     const [staffs, setStaffs] = useState()
     
     // Create separate count states for each data type
@@ -80,7 +82,7 @@ const AuditManagement = () => {
     }
 
     const getStaffs = async () => {
-        const res = await get('/administration/manage-users/?staff_only=true')
+        const res = await get('/administration/manage-users/all_users/?staff_only=true')
         setStaffs(res.data)
         console.log("Staffs data:", res);
     }
@@ -325,7 +327,7 @@ const AuditManagement = () => {
                                             </td>
                                             <td className="px-6 py-4 text-[12px] text-[#475467]">{ new Date(application?.updated_at).toDateString()}</td>
                                             <td className="px-6 py-4 text-[16px] text-[#475467] flex items-center gap-4">
-                                              <BiCalendar className="cursor-pointer"/>
+                                              <BiCalendar className="cursor-pointer" onClick={() => setScheduleAnAuditByApp(application)}/>
                                               <BsEye onClick={() => navigate(`/audit/application/${application.id}`)} className="cursor-pointer"/>
                                             </td>
                                         </tr>
@@ -455,6 +457,16 @@ const AuditManagement = () => {
             staffs={staffs} 
             applications={applications} 
             setScheduleAnAudit={setScheduleAnAudit} 
+            getAudits={() => handleAuditScheduled()}
+          />
+        )
+      }
+      {
+        scheduleAnAuditByApp && (
+          <ScheduleAnAuditByApp
+            staffs={staffs} 
+            scheduleAnAuditByApp={scheduleAnAuditByApp} 
+            setScheduleAnAuditByApp={setScheduleAnAuditByApp} 
             getAudits={() => handleAuditScheduled()}
           />
         )

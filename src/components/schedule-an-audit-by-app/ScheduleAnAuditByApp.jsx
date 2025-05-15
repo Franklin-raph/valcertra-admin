@@ -4,15 +4,34 @@ import { IoArrowBackOutline, IoCalculator, IoCloseOutline } from 'react-icons/io
 import { post } from '../../utils/axiosHelpers';
 import Alert from '../alert/Alert';
 import BtnLoader from '../btnLoader/BtnLoader';
-import { BiChevronDown } from 'react-icons/bi';
+import { BiChevronDown, BiGrid } from 'react-icons/bi';
 import { FiLoader, FiUser } from 'react-icons/fi';
+import { MdOutlineSettingsApplications, MdSettingsApplications } from 'react-icons/md';
 
-export default function ScheduleAnAudit({ staffs, setScheduleAnAudit, getAudits, applications }) {
+export default function ScheduleAnAuditByApp({ staffs, setScheduleAnAuditByApp, getAudits, scheduleAnAuditByApp }) {
   const [dropDown, setDropDown] = useState()
   const [auditor, setAuditor] = useState({})
   const [application, setApplication] = useState({})
   const [searchText, setSeacrhText] = useState('')
   const [loader, setLoader] = useState(false)
+//   const staffs = [
+//     {
+//         name:"Frank",
+//         id:"1"
+//     },
+//     {
+//         name:"Dan",
+//         id:"2"
+//     },
+//     {
+//         name:"Emma",
+//         id:"3"
+//     },
+//     {
+//         name:"Luke",
+//         id:"4"
+//     }
+//   ]
   const [formData, setFormData] = useState({
     scheduled_date: '',
     scheduled_time: '',
@@ -31,7 +50,7 @@ export default function ScheduleAnAudit({ staffs, setScheduleAnAudit, getAudits,
   };
 
   const scheduleAudit = async () => {
-    if(!formData.scheduled_date || !formData.scheduled_time || !formData.notes || !auditor || !application){
+    if(!formData.scheduled_date || !formData.scheduled_time || !formData.notes || !auditor || !scheduleAnAuditByApp){
         setMsg("Please fill in all fields")
         setAlertType('error')
         return
@@ -40,7 +59,7 @@ export default function ScheduleAnAudit({ staffs, setScheduleAnAudit, getAudits,
     
     try {
             setLoading(true)
-            const response = await post('/administration/audit-schedules/', {...formData, auditor:auditor.id, application:application.id})
+            const response = await post('/administration/audit-schedules/', {...formData, auditor:auditor.id, application:scheduleAnAuditByApp.id})
             setMsg(response.message)
             setAlertType('success')
             getAudits()
@@ -97,29 +116,9 @@ export default function ScheduleAnAudit({ staffs, setScheduleAnAudit, getAudits,
 
                 <div className='w-full relative mb-3'>
                     <label className="block text-sm font-medium text-[#344054] mb-1 text-left">Application</label>
-                    <div onClick={() => setDropDown(dropDown === "application" ? false : "application")} className='cursor-pointer border border-[#D0D5DD] bg-white py-2 px-2 w-full rounded-[4px] text-[#667085] flex items-center justify-between'>
-                        <FiUser className='text-[20px]' />
-                        <input type="text" placeholder='Select Application' value={application.product_name} className='outline-none bg-transparent w-full ml-3 cursor-pointer'/>
-                        <BiChevronDown className='text-[22px] cursor-pointer'/>
-                        {
-                            dropDown === "application" &&
-                            <div className='bg-white w-full absolute top-[70px] rounded-[4px] border border-gray-300 h-[200px] overflow-x-hidden overflow-y-scroll left-0 px-2 py-3 z-[100]'>
-                                {/* <input type="text" onChange={e => setSeacrhText(e.target.value)} placeholder='Search City' className='border border-gray-300 w-full placeholder:text-[13px] text-[13px] outline-none px-[4px] rounded mb-1 py-[5px]'/> */}
-                                <div>
-                                {
-                                    applications?.data?.filter(application => application.product_name.toLowerCase().includes(searchText.toLowerCase()))
-                                    .map((application) => (
-                                        <div className='flex items-center gap-2 hover:bg-gray-300 cursor-pointer p-[5px] text-[14px] text-gray-500'onClick={() => {
-                                            setDropDown(false)
-                                            setApplication(application)
-                                        }}>
-                                            <p>{application.product_name}</p>
-                                        </div>
-                                    ))
-                                }
-                                </div>
-                            </div>
-                        }
+                    <div className='cursor-pointer border border-[#D0D5DD] bg-white py-2 px-2 w-full rounded-[4px] text-[#667085] flex items-center justify-between'>
+                        <BiGrid className='text-[20px]' />
+                        <input type="text" placeholder='Select Application' value={scheduleAnAuditByApp.product_name} className='outline-none bg-transparent w-full ml-3 cursor-pointer'/>
                     </div>
                 </div>
 
@@ -167,7 +166,7 @@ export default function ScheduleAnAudit({ staffs, setScheduleAnAudit, getAudits,
                     :
                     <div className="flex justify-between space-x-3 mt-7 mb-1">
                         <button
-                            onClick={() => setScheduleAnAudit(false)}
+                            onClick={() => setScheduleAnAuditByApp(false)}
                             className="border border-[#D0D5DD] text-[#344054] py-2 px-4 rounded w-full"
                             >
                             Cancel

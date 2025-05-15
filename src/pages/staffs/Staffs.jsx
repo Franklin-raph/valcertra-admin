@@ -48,7 +48,7 @@ const Staffs = () => {
       setStaffs(res)
       console.log(res);
     }
-
+    
     useEffect(() => {
       const fetchData = async () => {
         setIsLoading(true);
@@ -58,6 +58,18 @@ const Staffs = () => {
       
       fetchData();
     }, []);
+    
+    const getNext = async (nextPage) => {
+      const res = await get(nextPage)
+      setStaffs(res)
+      console.log(res);
+    }
+    
+    const getPrev = async (prevPage) => {
+      const res = await get(prevPage)
+      setStaffs(res)
+      console.log(res);
+    }
   
   return (
     <div>
@@ -212,6 +224,10 @@ const Staffs = () => {
                         }
                     </tbody>
                 </table>
+                <div className="flex items-center justify-between p-3">
+                  <button className="border py-[4px] px-4 rounded" onClick={() => getPrev(staffs.previous)}>Prev</button>
+                  <button className="border py-[4px] px-4 rounded" onClick={() => getNext(staffs.next)}>Next</button>
+                </div>
               </div>
             </div>
           </div>
