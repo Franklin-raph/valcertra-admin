@@ -9,7 +9,7 @@ import { FiLoader, FiUser } from 'react-icons/fi';
 
 export default function AddAStaff({ staffs, setAddStaff, getStaffs }) {
   const [dropDown, setDropDown] = useState()
-  const [selectdRole, setSelectdRole] = useState({})
+  let [selectdRole, setSelectdRole] = useState({})
   const [loader, setLoader] = useState(false)
   const roles = [
     {
@@ -48,16 +48,16 @@ export default function AddAStaff({ staffs, setAddStaff, getStaffs }) {
   };
 
   const addAStaff = async () => {
-    if(!formData.first_name || !formData.last_name || !formData.email){
+    if(!formData.first_name || !formData.last_name || !formData.email || !formData.password ){
         setMsg("Please fill in all fields")
         setAlertType('error')
         return
     }
-    // console.log( {...formData, auditor:auditor.id, applicationapplication:application.id});
+    console.log( {...formData, role:selectdRole.value});
     
     try {
             setLoading(true)
-            const response = await post('/administration/audit-schedules/', {...formData, auditor:"auditor.id"})
+            const response = await post('/administration/manage-users/create_staff/', {...formData, role:selectdRole.value})
             setMsg(response.message)
             setAlertType('success')
             getStaffs()
@@ -66,6 +66,7 @@ export default function AddAStaff({ staffs, setAddStaff, getStaffs }) {
             formData.email = ""
             formData.password = ""
             selectdRole = {}
+            
         } catch (error) {
             setMsg(error.message)
             setAlertType('error')
